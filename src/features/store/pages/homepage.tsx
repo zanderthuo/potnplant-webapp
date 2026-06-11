@@ -1,4 +1,4 @@
-import { ShoppingCart } from "lucide-react";
+import { Mail, MapPin, Phone, ChevronLeft, ChevronRight } from "lucide-react";
 import { Fragment, useMemo, useState } from "react";
 
 import catTerrarium from "../../../assets/cat-terrarium.jpg";
@@ -11,13 +11,16 @@ import { ProductCard } from "../../../components/ProductCard";
 import { StoreLayout } from "../../../components/layout/StoreLayout";
 import { useContent, type SiteContent } from "../../../lib/content";
 
+
 type ProductTab = "all" | "new" | "sale";
+
+const PRODUCTS_PER_PAGE = 8;
 
 export default function HomePage() {
   const [tab, setTab] = useState<ProductTab>("all");
 
   const { content } = useContent();
-  const { hero, journey, deals } = content;
+  const { hero } = content;
 
   const list = useMemo(() => {
     return products.filter((product) => {
@@ -30,17 +33,17 @@ export default function HomePage() {
   return (
     <StoreLayout>
       <HeroSection hero={hero} />
-      <OurServices journey={journey} />
+      <OurServices />
       <CategorySection />
       <ProductsSection tab={tab} setTab={setTab} products={list} />
-      <DealsSection deals={deals} />
+      <ContactSection />
     </StoreLayout>
   );
 }
 
 function HeroSection({ hero }: { hero: SiteContent["hero"] }) {
   return (
-    <section className="relative bg-secondary/60">
+    <section id="home" className="relative scroll-mt-24 bg-secondary/60">
       <div className="mx-auto grid max-w-7xl items-center gap-8 px-6 py-16 md:grid-cols-2 md:py-24">
         <div>
           <div className="flex items-center gap-3">
@@ -54,12 +57,19 @@ function HeroSection({ hero }: { hero: SiteContent["hero"] }) {
 
           <p className="mt-6 max-w-md text-muted-foreground">{hero.body}</p>
 
-          <div className="mt-10 flex items-center gap-6">
+          <div className="mt-10 flex flex-wrap items-center gap-6">
             <a
               href="/shop"
               className="bg-primary px-8 py-4 text-sm font-semibold uppercase tracking-widest text-primary-foreground transition hover:bg-leaf-deep"
             >
               {hero.ctaLabel}
+            </a>
+
+            <a
+              href="#services"
+              className="text-sm font-semibold uppercase tracking-widest text-primary hover:underline"
+            >
+              View services
             </a>
           </div>
         </div>
@@ -72,19 +82,13 @@ function HeroSection({ hero }: { hero: SiteContent["hero"] }) {
             height={1200}
             className="w-full"
           />
-
-          <div className="absolute -bottom-4 right-0 hidden bg-card px-5 py-3 text-xs font-medium tracking-widest md:block">
-            <span className="text-foreground">02</span>
-            <span className="mx-3 inline-block h-px w-12 align-middle bg-border" />
-            <span className="text-muted-foreground">03</span>
-          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function OurServices({ journey }: { journey: SiteContent["journey"] }) {
+function OurServices() {
   const services = [
     {
       title: "Rent a Potted Plant",
@@ -117,15 +121,17 @@ function OurServices({ journey }: { journey: SiteContent["journey"] }) {
   ];
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-24">
+    <section id="services" className="mx-auto max-w-7xl scroll-mt-24 px-6 py-24">
       <div className="text-center">
-        <p className="eyebrow">{journey.eyebrow}</p>
+        <p className="eyebrow">What We Offer</p>
 
         <h2 className="mt-3 font-display text-5xl">Our Services</h2>
 
-        <p className="mx-auto mt-6 max-w-2xl text-muted-foreground">
-          {journey.body}
-        </p>
+        {/* <p className="mx-auto mt-6 max-w-2xl text-muted-foreground">
+          We provide quality plants, professional plant care services, gardening
+          support, and beautiful green solutions for homes, offices, events, and
+          outdoor spaces.
+        </p> */}
       </div>
 
       <div className="mt-16 grid gap-8 md:grid-cols-3">
@@ -161,37 +167,37 @@ function CategorySection() {
   const categories = [
     {
       img: catTerrarium,
-      name: "Small Plants",
+      name: "Indoor Potted Plants",
       count: 13,
       className: "md:row-span-2",
     },
     {
       img: catSucculents,
-      name: "Succulents",
+      name: "Outdoor Potted Plants",
       count: 3,
     },
     {
       img: catPotter,
-      name: "Potter Plants",
+      name: "Plant Stands",
       count: 6,
     },
     {
       img: catHanging,
-      name: "Terrariums",
+      name: "Compost Soil",
       count: 1,
     },
     {
       img: catPotter,
-      name: "Hanging",
+      name: "Gardening Tools",
       count: 6,
     },
   ];
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-16">
+    <section id="categories" className="mx-auto max-w-7xl scroll-mt-24 px-6 py-16">
       <div className="text-center">
-        <p className="eyebrow">All kinds of plants</p>
-        <h2 className="mt-3 font-display text-5xl">Discovery category</h2>
+        <p className="eyebrow">Our Products</p>
+        <h2 className="mt-3 font-display text-5xl">Product Categories</h2>
       </div>
 
       <div className="mt-12 grid gap-4 md:grid-cols-3 md:grid-rows-2">
@@ -218,14 +224,28 @@ function ProductsSection({
   setTab: (tab: ProductTab) => void;
   products: Product[];
 }) {
+  const [page, setPage] = useState(1);
+
   const tabs: { key: ProductTab; label: string }[] = [
-    { key: "all", label: "All Plants" },
+    { key: "all", label: "All Products" },
     { key: "new", label: "New Arrivals" },
     { key: "sale", label: "Sale" },
   ];
 
+  const totalPages = Math.max(1, Math.ceil(products.length / PRODUCTS_PER_PAGE));
+
+  const paginatedProducts = products.slice(
+    (page - 1) * PRODUCTS_PER_PAGE,
+    page * PRODUCTS_PER_PAGE
+  );
+
+  const handleTabChange = (selectedTab: ProductTab) => {
+    setTab(selectedTab);
+    setPage(1);
+  };
+
   return (
-    <section className="mx-auto max-w-7xl px-6 py-16">
+    <section id="products" className="mx-auto max-w-7xl scroll-mt-24 px-6 py-16">
       <div className="flex flex-wrap items-center justify-center gap-10 font-display text-2xl md:text-3xl">
         {tabs.map((item, index) => (
           <Fragment key={item.key}>
@@ -233,7 +253,7 @@ function ProductsSection({
 
             <button
               type="button"
-              onClick={() => setTab(item.key)}
+              onClick={() => handleTabChange(item.key)}
               className={
                 tab === item.key
                   ? "text-foreground"
@@ -247,68 +267,169 @@ function ProductsSection({
       </div>
 
       <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-        {products.map((product) => (
+        {paginatedProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="mt-12 flex items-center justify-center gap-2">
+          <button
+            type="button"
+            disabled={page === 1}
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Prev
+          </button>
+
+          {Array.from({ length: totalPages }).map((_, index) => {
+            const pageNumber = index + 1;
+
+            return (
+              <button
+                key={pageNumber}
+                type="button"
+                onClick={() => setPage(pageNumber)}
+                className={`grid h-10 w-10 place-items-center border text-sm transition ${
+                  page === pageNumber
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border hover:bg-muted"
+                }`}
+              >
+                {pageNumber}
+              </button>
+            );
+          })}
+
+          <button
+            type="button"
+            disabled={page === totalPages}
+            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+            className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ContactSection() {
+  return (
+    <section id="contact" className="scroll-mt-24 bg-muted/60">
+      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 md:grid-cols-2">
+        <div>
+          <p className="eyebrow">Get in touch</p>
+          <h2 className="mt-3 font-display text-5xl">Contact Us</h2>
+
+          <p className="mt-6 max-w-md text-muted-foreground">
+            Need plants for your home, office, event, or garden? Reach out and
+            we will help you choose the right plants and care service.
+          </p>
+
+          <div className="mt-8 space-y-5">
+            <ContactItem
+              icon={<Phone className="h-5 w-5" />}
+              title="Phone"
+              value="+254 700 000 000"
+              href="tel:+254700000000"
+            />
+
+            <ContactItem
+              icon={<Mail className="h-5 w-5" />}
+              title="Email"
+              value="info@yourbusiness.com"
+              href="mailto:info@yourbusiness.com"
+            />
+
+            <ContactItem
+              icon={<MapPin className="h-5 w-5" />}
+              title="Location"
+              value="Nairobi, Kenya"
+            />
+          </div>
+        </div>
+
+        <div className="border border-border bg-card p-8">
+          <h3 className="font-display text-2xl">Send us a message</h3>
+
+          <form className="mt-6 space-y-4">
+            <input
+              type="text"
+              placeholder="Your name"
+              className="w-full border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+            />
+
+            <input
+              type="email"
+              placeholder="Email address"
+              className="w-full border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+            />
+
+            <input
+              type="tel"
+              placeholder="Phone number"
+              className="w-full border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+            />
+
+            <textarea
+              rows={5}
+              placeholder="Tell us what you need..."
+              className="w-full border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+            />
+
+            <button
+              type="submit"
+              className="w-full bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-leaf-deep"
+            >
+              Send message
+            </button>
+          </form>
+        </div>
       </div>
     </section>
   );
 }
 
-function DealsSection({ deals }: { deals: SiteContent["deals"] }) {
-  return (
-    <section className="bg-muted/60">
-      <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-2">
-        <div className="relative">
-          <div className="absolute left-10 top-6 h-64 w-64 rounded-full bg-card" />
-
-          <img
-            src={deals.image}
-            alt="Deal of the day"
-            width={1200}
-            height={1200}
-            loading="lazy"
-            className="relative mx-auto max-h-[500px] object-contain"
-          />
-
-          <span className="absolute right-4 top-16 grid h-24 w-24 place-items-center rounded-full bg-accent text-accent-foreground">
-            <div className="px-2 text-center">
-              <div className="font-display text-sm font-bold leading-tight">
-                {deals.priceLabel}
-              </div>
-            </div>
-          </span>
-        </div>
-
-        <div>
-          <p className="eyebrow">{deals.eyebrow}</p>
-          <h2 className="mt-3 font-display text-5xl">{deals.title}</h2>
-
-          <div className="mt-10 flex flex-wrap gap-4">
-            {["02", "18", "44", "09"].map((number, index) => (
-              <div key={`${number}-${index}`} className="text-center">
-                <div className="grid h-24 w-24 place-items-center rounded-full bg-card font-display text-3xl">
-                  {number}
-                </div>
-
-                <p className="mt-3 eyebrow">
-                  {["Days", "Hours", "Mins", "Secs"][index]}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            className="mt-10 inline-flex items-center gap-3 bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-leaf-deep"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            {deals.ctaLabel}
-          </button>
-        </div>
+function ContactItem({
+  icon,
+  title,
+  value,
+  href,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  value: string;
+  href?: string;
+}) {
+  const content = (
+    <div className="flex items-center gap-4">
+      <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary">
+        {icon}
       </div>
-    </section>
+
+      <div>
+        <p className="text-xs uppercase tracking-widest text-muted-foreground">
+          {title}
+        </p>
+        <p className="mt-1 font-semibold">{value}</p>
+      </div>
+    </div>
   );
+
+  if (href) {
+    return (
+      <a href={href} className="block hover:text-primary">
+        {content}
+      </a>
+    );
+  }
+
+  return content;
 }
 
 function CategoryTile({

@@ -1,24 +1,46 @@
-import { useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { products, categories } from "../../../lib/products";
 import { ProductCard } from "../../../components/ProductCard";
 import { StoreLayout } from "../../../components/layout/StoreLayout";
+
+const PRODUCTS_PER_PAGE = 6;
 
 export default function ShopPage() {
   const [cat, setCat] = useState<string>("All");
   const [sort, setSort] = useState<"default" | "price-asc" | "price-desc">(
     "default"
   );
-
-  const filtered = products
-    .filter((product) => cat === "All" || product.category === cat)
-    .sort((a, b) => {
-      if (sort === "price-asc") return a.price - b.price;
-      if (sort === "price-desc") return b.price - a.price;
-      return 0;
-    });
+  const [page, setPage] = useState(1);
 
   const cats = ["All", ...Array.from(new Set(products.map((p) => p.category)))];
+
+  const filtered = useMemo(() => {
+    return products
+      .filter((product) => cat === "All" || product.category === cat)
+      .sort((a, b) => {
+        if (sort === "price-asc") return a.price - b.price;
+        if (sort === "price-desc") return b.price - a.price;
+        return 0;
+      });
+  }, [cat, sort]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PRODUCTS_PER_PAGE));
+
+  const paginatedProducts = filtered.slice(
+    (page - 1) * PRODUCTS_PER_PAGE,
+    page * PRODUCTS_PER_PAGE
+  );
+
+  const handleCategoryChange = (category: string) => {
+    setCat(category);
+    setPage(1);
+  };
+
+  const handleSortChange = (value: typeof sort) => {
+    setSort(value);
+    setPage(1);
+  };
 
   return (
     <StoreLayout>
@@ -43,7 +65,7 @@ export default function ShopPage() {
               <button
                 key={category}
                 type="button"
-                onClick={() => setCat(category)}
+                onClick={() => handleCategoryChange(category)}
                 className={`pb-1 transition ${
                   cat === category
                     ? "border-b-2 border-primary font-semibold text-foreground"
@@ -57,7 +79,9 @@ export default function ShopPage() {
 
           <select
             value={sort}
-            onChange={(event) => setSort(event.target.value as typeof sort)}
+            onChange={(event) =>
+              handleSortChange(event.target.value as typeof sort)
+            }
             className="border border-border bg-card px-4 py-2 text-sm"
           >
             <option value="default">Default sorting</option>
@@ -72,21 +96,97 @@ export default function ShopPage() {
 
             <ul className="mt-6 space-y-3 text-sm">
               {categories.map((category) => (
-                <li
-                  key={category.name}
-                  className="flex justify-between border-b border-border/60 pb-3 text-muted-foreground hover:text-foreground"
-                >
-                  <span>{category.name}</span>
-                  <span>({category.count})</span>
+                <li key={category.name}>
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryChange(category.name)}
+                    className={`flex w-full justify-between border-b border-border/60 pb-3 text-left transition ${
+                      cat === category.name
+                        ? "font-semibold text-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <span>{category.name}</span>
+                    <span>({category.count})</span>
+                  </button>
                 </li>
               ))}
             </ul>
           </aside>
 
-          <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+          <div>
+            <div className="mb-6 flex items-center justify-between text-sm text-muted-foreground">
+              <p>
+                Showing{" "}
+                <span className="font-medium text-foreground">
+                  {paginatedProducts.length}
+                </span>{" "}
+                of{" "}
+                <span className="font-medium text-foreground">
+                  {filtered.length}
+                </span>{" "}
+                products
+              </p>
+
+              <p>
+                Page{" "}
+                <span className="font-medium text-foreground">{page}</span> of{" "}
+                <span className="font-medium text-foreground">
+                  {totalPages}
+                </span>
+              </p>
+            </div>
+
+            <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+              {paginatedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="mt-12 flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  disabled={page === 1}
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Prev
+                </button>
+
+                {Array.from({ length: totalPages }).map((_, index) => {
+                  const pageNumber = index + 1;
+
+                  return (
+                    <button
+                      key={pageNumber}
+                      type="button"
+                      onClick={() => setPage(pageNumber)}
+                      className={`grid h-10 w-10 place-items-center border text-sm transition ${
+                        page === pageNumber
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border hover:bg-muted"
+                      }`}
+                    >
+                      {pageNumber}
+                    </button>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  disabled={page === totalPages}
+                  onClick={() =>
+                    setPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

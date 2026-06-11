@@ -1,23 +1,35 @@
-import { Search, ShoppingBag, User, Phone } from "lucide-react";
+import { Phone, ShoppingBag, User } from "lucide-react";
 import { useCart } from "../../lib/cart";
 import logo from "../../assets/logo.jpeg";
 
 const nav = [
-  { to: "/", label: "Home" },
+  { to: "/#home", label: "Home" },
+  { to: "/#services", label: "Services" },
+  { to: "/#categories", label: "Categories" },
+  { to: "/#products", label: "Plants" },
+  { to: "/#contact", label: "Contact Us" },
   { to: "/shop", label: "Shop" },
-  { to: "/shop", label: "Plants" },
-  { to: "/shop", label: "Pots & Care" },
-  { to: "/admin", label: "Admin" },
 ];
 
 export function SiteHeader() {
   const { count } = useCart();
-  const path = window.location.pathname;
+
+  const currentPath = window.location.pathname;
+  const currentHash = window.location.hash;
+  const currentUrl = `${currentPath}${currentHash}`;
+
+  const isActive = (to: string) => {
+    if (to === "/#home") {
+      return currentPath === "/" && (currentHash === "" || currentHash === "#home");
+    }
+
+    return currentUrl === to || currentPath === to;
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
-        <a href="/" className="flex items-center gap-3">
+        <a href="/#home" className="flex items-center gap-3">
           <img
             src={logo}
             alt="PotnPlant"
@@ -26,12 +38,12 @@ export function SiteHeader() {
         </a>
 
         <nav className="hidden flex-1 items-center justify-center gap-8 text-sm md:flex">
-          {nav.map((item, index) => {
-            const active = path === item.to;
+          {nav.map((item) => {
+            const active = isActive(item.to);
 
             return (
               <a
-                key={`${item.label}-${index}`}
+                key={item.to}
                 href={item.to}
                 className={`relative pb-1 transition ${
                   active
@@ -55,17 +67,17 @@ export function SiteHeader() {
             <span className="text-foreground">(+254) 700 000 000</span>
           </span>
 
-          <button type="button" className="hover:text-foreground">
-            <Search className="h-4 w-4" />
-          </button>
-
-          <a
+          {/* <a
             href="/admin"
-            className="hidden items-center gap-1.5 hover:text-foreground sm:flex"
+            className={`hidden items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm font-medium transition lg:flex ${
+              isActive("/admin")
+                ? "bg-primary text-primary-foreground"
+                : "text-foreground hover:bg-primary hover:text-primary-foreground"
+            }`}
           >
             <User className="h-4 w-4" />
-            Log in
-          </a>
+            Admin
+          </a> */}
 
           <a
             href="/cart"
