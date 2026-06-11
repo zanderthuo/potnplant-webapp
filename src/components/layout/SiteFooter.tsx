@@ -38,7 +38,7 @@ export function SiteFooter() {
               href="tel:+254700000000"
               className="font-medium hover:text-primary"
             >
-              (+254) 700 000 000
+              (+254) 788 727 645
             </a>
           </p>
 

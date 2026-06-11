@@ -129,7 +129,7 @@ export function SiteHeader() {
             <div className="mt-4 border-t border-border pt-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <span>(+254) 700 000 000</span>
+                <span>(+254) 788 727 645</span>
               </div>
             </div>
           </nav>
