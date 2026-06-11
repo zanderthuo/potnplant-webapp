@@ -335,15 +335,15 @@ function ContactSection() {
             <ContactItem
               icon={<Phone className="h-5 w-5" />}
               title="Phone"
-              value="+254 700 000 000"
-              href="tel:+254700000000"
+              value="+254 788 727 645"
+              href="tel:+254788727645"
             />
 
             <ContactItem
               icon={<Mail className="h-5 w-5" />}
               title="Email"
-              value="info@yourbusiness.com"
-              href="mailto:info@yourbusiness.com"
+              value="info@potnplant.co.ke"
+              href="mailto:info@potnplant.co.ke"
             />
 
             <ContactItem
