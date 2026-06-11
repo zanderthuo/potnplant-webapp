@@ -1,7 +1,8 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/wvkptxmx/public_html/
+    - export REPOPATH=/home/wvkptxmx/repositories/potnplant-webapp2
+    - export DEPLOYPATH=/home/wvkptxmx/public_html
     - /bin/rm -rf $DEPLOYPATH/*
-    - /bin/cp -R dist/* $DEPLOYPATH
-
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/cp -R $REPOPATH/dist/. $DEPLOYPATH/
