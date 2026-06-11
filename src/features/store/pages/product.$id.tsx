@@ -69,10 +69,6 @@ export default function ProductPage() {
 
           <h1 className="mt-3 font-display text-5xl">{product.name}</h1>
 
-          <p className="mt-2 text-sm italic text-muted-foreground">
-            {product.latin}
-          </p>
-
           <div className="mt-6 flex items-baseline gap-3">
             {product.compareAt && (
               <span className="text-xl text-muted-foreground line-through">
