@@ -5,7 +5,7 @@ import { StoreLayout } from "../../../components/layout/StoreLayout";
 export default function CartPage() {
   const { detailed, setQty, remove, subtotal, clear } = useCart();
 
-  const shipping = detailed.length ? 8 : 0;
+  const shipping = detailed.length ? 0 : 0;
   const total = subtotal + shipping;
 
   if (!detailed.length) {

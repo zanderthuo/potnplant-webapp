@@ -1,26 +1,23 @@
-import {
-  type InputHTMLAttributes,
-  type ReactNode,
-} from "react";
+import { type InputHTMLAttributes, type ReactNode } from "react";
 import { MessageCircle } from "lucide-react";
 import { useCart } from "../../../lib/cart";
 import { StoreLayout } from "../../../components/layout/StoreLayout";
 
-const WHATSAPP_NUMBER = "254719808225"; // replace with your WhatsApp number
+const WHATSAPP_NUMBER = "254719808225";
 
 export default function CheckoutPage() {
   const { detailed, subtotal } = useCart();
 
-  const shipping = detailed.length ? 0 : 0;
+  const shipping = 0;
   const tax = 0;
   const total = subtotal + shipping + tax;
 
   const createWhatsAppMessage = () => {
     const productLines = detailed
       .map(({ product, qty }) => {
-        return `- ${product.name} x${qty} = Ksh. ${(product.price * qty).toFixed(
-          2
-        )}`;
+        return `- ${product.name} x${qty} = Ksh. ${(
+          product.price * qty
+        ).toFixed(2)}`;
       })
       .join("\n");
 
@@ -37,12 +34,9 @@ Total: Ksh. ${total.toFixed(2)}
 Please confirm availability and delivery details.`;
   };
 
-  const placeOrderOnWhatsApp = () => {
-    const message = encodeURIComponent(createWhatsAppMessage());
-    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
-
-    window.open(whatsappUrl, "_blank");
-  };
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(
+    createWhatsAppMessage()
+  )}`;
 
   if (!detailed.length) {
     return (
@@ -115,7 +109,7 @@ Please confirm availability and delivery details.`;
                   <div className="flex-1">
                     <p className="font-display text-base">{product.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      Ksh. {product.price}.00
+                      Ksh. {product.price.toFixed(2)}
                     </p>
                   </div>
 
@@ -139,14 +133,15 @@ Please confirm availability and delivery details.`;
               </div>
             </dl>
 
-            <button
-              type="button"
-              onClick={placeOrderOnWhatsApp}
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-6 inline-flex w-full items-center justify-center gap-3 bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-leaf-deep"
             >
               <MessageCircle className="h-4 w-4" />
               Place order using WhatsApp
-            </button>
+            </a>
 
             <a
               href="/cart"
