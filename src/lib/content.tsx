@@ -24,7 +24,7 @@ const DEFAULTS: SiteContent = {
     eyebrow: "Welcome to PotnPlant",
     title: "POTNPLANT",
     body:
-      "PotnPlant is your complete garden centre for plants in Kenya. We enhance the beauty of indoor and outdoor spaces through carefully selected plants, gardening products, and professional plant care services tailored to your needs.",
+      "is your complete garden centre for plants in Kenya. We enhance the beauty of indoor and outdoor spaces through carefully selected plants, gardening products, and professional plant care services tailored to your needs.",
     ctaLabel: "Shop Plants",
     image: heroPlants,
   },
