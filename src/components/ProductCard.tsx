@@ -1,4 +1,4 @@
-import { Heart, Search, Repeat } from "lucide-react";
+import { Search } from "lucide-react";
 import type { Product } from "../lib/products";
 import { useCart } from "../lib/cart";
 
@@ -36,13 +36,6 @@ export function ProductCard({ product }: { product: Product }) {
         </a>
 
         <div className="absolute right-3 top-3 flex flex-col gap-2 opacity-100 md:translate-x-12 md:opacity-0 md:transition-all md:duration-300 md:group-hover:translate-x-0 md:group-hover:opacity-100">
-          <button
-            type="button"
-            className="grid h-10 w-10 place-items-center bg-card text-foreground shadow-sm hover:text-primary"
-          >
-            <Heart className="h-4 w-4" />
-          </button>
-
           <a
             href={productUrl}
             className="grid h-10 w-10 place-items-center bg-card text-foreground shadow-sm hover:text-primary"
@@ -50,12 +43,6 @@ export function ProductCard({ product }: { product: Product }) {
             <Search className="h-4 w-4" />
           </a>
 
-          <button
-            type="button"
-            className="grid h-10 w-10 place-items-center bg-card text-foreground shadow-sm hover:text-primary"
-          >
-            <Repeat className="h-4 w-4" />
-          </button>
         </div>
 
         <button
