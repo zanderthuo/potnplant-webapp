@@ -1,13 +1,16 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 
 import heroPlants from "../assets/hero-plants.jpg";
+import catTerrarium from "../assets/cat-terrarium.jpg";
+import catSucculents from "../assets/cat-succulents.jpg";
+import catPotter from "../assets/cat-potter.jpg";
+import catHanging from "../assets/cat-hanging.jpg";
 
 export type SiteContent = {
   hero: {
@@ -17,16 +20,135 @@ export type SiteContent = {
     ctaLabel: string;
     image: string;
   };
+  services: {
+    eyebrow: string;
+    title: string;
+    items: {
+      title: string;
+      icon: string;
+      points: string[];
+    }[];
+  };
+  categories: {
+    eyebrow: string;
+    title: string;
+    items: {
+      name: string;
+      count: number;
+      image: string;
+      className?: string;
+    }[];
+  };
+  productsSection: {
+    allLabel: string;
+    newLabel: string;
+    saleLabel: string;
+  };
+  contact: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    phone: string;
+    email: string;
+    location: string;
+    formTitle: string;
+    buttonLabel: string;
+  };
 };
 
-const DEFAULTS: SiteContent = {
+export const DEFAULTS: SiteContent = {
   hero: {
     eyebrow: "Welcome to PotnPlant",
-    title: "POTNPLANT",
-    body:
-      "is your complete garden centre for plants in Kenya. We enhance the beauty of indoor and outdoor spaces through carefully selected plants, gardening products, and professional plant care services tailored to your needs.",
+    title: "POTnPLANT",
+    body: "PotnPlant is your everything garden centre for plants in Kenya. We enhance life and beauty of your indoor and outdoor spaces through selected plants. At PotnPlant KENYA our services and products are tailored to suit your everyday gardening needs.",
     ctaLabel: "Shop Plants",
     image: heroPlants,
+  },
+
+  services: {
+    eyebrow: "What We Offer",
+    title: "Our Services",
+    items: [
+      {
+        title: "Rent a Potted Plant",
+        icon: "🪴",
+        points: [
+          "We provide beautiful, well-nurtured plants to create a refreshing and lively environment.",
+          "We cater for homes, events, and office spaces.",
+          "We source and stock a wide selection of healthy indoor and outdoor plants.",
+          "We install, maintain, and replace plants according to specific needs.",
+        ],
+      },
+      {
+        title: "Plant Care",
+        icon: "🌿",
+        points: [
+          "Our gardeners understand the essence of a healthy plant.",
+          "Soil, water, light, and environment affect plant growth.",
+          "We ensure your plants are cared for according to their unique needs.",
+        ],
+      },
+      {
+        title: "Hire a Gardener",
+        icon: "👨‍🌾",
+        points: [
+          "Our experienced gardeners provide customized care to your garden.",
+          "We ensure your plants remain healthy and vibrant.",
+          "We help improve your living spaces.",
+        ],
+      },
+    ],
+  },
+
+  categories: {
+    eyebrow: "Our Products",
+    title: "Product Categories",
+    items: [
+      {
+        name: "Indoor Potted Plants",
+        count: 13,
+        image: catTerrarium,
+        className: "md:row-span-2",
+      },
+      {
+        name: "Outdoor Potted Plants",
+        count: 3,
+        image: catSucculents,
+      },
+      {
+        name: "Plant Stands",
+        count: 6,
+        image: catPotter,
+      },
+      {
+        name: "Compost Soil",
+        count: 1,
+        image: catHanging,
+      },
+      {
+        name: "Gardening Tools",
+        count: 6,
+        image: catPotter,
+      },
+    ],
+  },
+
+  productsSection: {
+    allLabel: "All Products",
+    newLabel: "New Arrivals",
+    saleLabel: "Sale",
+  },
+
+  contact: {
+    eyebrow: "Get in touch",
+    title: "Contact Us",
+    body:
+      "Need plants for your home, office, event, or garden? Reach out and we will help you choose the right plants and care service.",
+    phone: "+254 788 727 645",
+    email: "info@potnplant.co.ke",
+    location: "Nairobi, Kenya",
+    formTitle: "Send us a message",
+    buttonLabel: "Send message",
   },
 };
 
@@ -34,40 +156,51 @@ const KEY = "potnplant.content.v1";
 
 type Ctx = {
   content: SiteContent;
-  update: (
-    section: keyof SiteContent,
-    patch: Partial<SiteContent[keyof SiteContent]>
+  update: <K extends keyof SiteContent>(
+    section: K,
+    patch: Partial<SiteContent[K]>
   ) => void;
   reset: () => void;
 };
 
 const ContentContext = createContext<Ctx | null>(null);
 
-export function ContentProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const [content, setContent] = useState<SiteContent>(DEFAULTS);
+function mergeContent(saved: Partial<SiteContent>): SiteContent {
+  return {
+    hero: {
+      ...DEFAULTS.hero,
+      ...saved.hero,
+    },
+    services: {
+      ...DEFAULTS.services,
+      ...saved.services,
+      items: saved.services?.items ?? DEFAULTS.services.items,
+    },
+    categories: {
+      ...DEFAULTS.categories,
+      ...saved.categories,
+      items: saved.categories?.items ?? DEFAULTS.categories.items,
+    },
+    productsSection: {
+      ...DEFAULTS.productsSection,
+      ...saved.productsSection,
+    },
+    contact: {
+      ...DEFAULTS.contact,
+      ...saved.contact,
+    },
+  };
+}
 
-  useEffect(() => {
+export function ContentProvider({ children }: { children: ReactNode }) {
+  const [content, setContent] = useState<SiteContent>(() => {
     try {
       const raw = localStorage.getItem(KEY);
-
-      if (raw) {
-        const parsed = JSON.parse(raw);
-
-        setContent({
-          hero: {
-            ...DEFAULTS.hero,
-            ...parsed.hero,
-          },
-        });
-      }
+      return raw ? mergeContent(JSON.parse(raw)) : DEFAULTS;
     } catch {
-      // ignore local storage errors
+      return DEFAULTS;
     }
-  }, []);
+  });
 
   const value = useMemo<Ctx>(
     () => ({

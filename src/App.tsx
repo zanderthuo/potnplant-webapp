@@ -1,17 +1,17 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ContentProvider } from "./lib/content";
 import { CartProvider } from "./lib/cart";
-import ShopPage from "./features/store/pages/shop";
-import ProductPage from "./features/store/pages/product.$id";
-import CartPage from "./features/store/pages/cart";
-import CheckoutPage from "./features/store/pages/checkout";
+import ShopPage from "./features/shop/pages/shop";
+import ProductPage from "./features/shop/pages/product.$id";
+import CartPage from "./features/shop/pages/cart";
+import CheckoutPage from "./features/shop/pages/checkout";
 import AdminLayout from "./features/admin/pages/admin";
 import DashboardAdmin from "./features/admin/pages/admin.index";
 import AdminProducts from "./features/admin/pages/admin.products";
 import AdminOrders from "./features/admin/pages/admin.orders";
 import AdminCustomers from "./features/admin/pages/admin.customers";
 import AdminContent from "./features/admin/pages/admin.content";
-import HomePage from "./features/store/pages/homepage";
+import HomePage from "./features/shop/pages/homepage";
 
 
 export default function App() {

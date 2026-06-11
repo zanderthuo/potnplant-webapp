@@ -36,7 +36,7 @@ export default function DashboardAdmin() {
           <h1 className="mt-1 font-display text-4xl">Dashboard</h1>
         </div>
 
-        <p className="text-sm text-muted-foreground">Welcome back, Alycia 🌿</p>
+        <p className="text-sm text-muted-foreground">Welcome back, Admin 🌿</p>
       </header>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">

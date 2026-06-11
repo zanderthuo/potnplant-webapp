@@ -64,7 +64,6 @@ export default function ProductsAdmin() {
 
                     <div>
                       <p className="font-medium">{product.name}</p>
-                      <p className="text-xs italic text-muted-foreground">{product.latin}</p>
                     </div>
                   </div>
                 </td>

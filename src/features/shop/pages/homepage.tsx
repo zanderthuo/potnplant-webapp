@@ -335,8 +335,8 @@ function ContactSection() {
             <ContactItem
               icon={<Phone className="h-5 w-5" />}
               title="Phone"
-              value="+254 788 727 645"
-              href="tel:+254788727645"
+              value="+254 143 513 999"
+              href="tel:+254143513999"
             />
 
             <ContactItem

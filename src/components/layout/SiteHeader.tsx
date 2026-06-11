@@ -74,7 +74,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span className="hidden items-center gap-2 lg:flex">
             <Phone className="h-3.5 w-3.5" />
-            <span className="text-foreground">(+254) 700 000 000</span>
+            <span className="text-foreground">(+254) 143 513 999</span>
           </span>
 
           <a

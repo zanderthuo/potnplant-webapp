@@ -1,7 +1,7 @@
-import { Upload, RotateCcw } from "lucide-react";
+import { Plus, RotateCcw, Trash2, Upload } from "lucide-react";
 import {
-  useContent,
   fileToDataUrl,
+  useContent,
   type SiteContent,
 } from "../../../lib/content";
 
@@ -15,7 +15,7 @@ export default function ContentAdmin() {
           <p className="eyebrow">Site content</p>
           <h1 className="mt-1 font-display text-4xl">Pages & sections</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Edit text and imagery for the storefront. Changes save instantly to this browser.
+            Edit homepage text, services, categories, contact details, and images.
           </p>
         </div>
 
@@ -32,39 +32,385 @@ export default function ContentAdmin() {
       </header>
 
       <div className="mt-8 space-y-6">
-        <SectionCard title="Hero section">
-          <Field label="Eyebrow" value={content.hero.eyebrow} onChange={(v) => update("hero", { eyebrow: v })} />
-          <Field label="Title (use \\n for new line)" value={content.hero.title} onChange={(v) => update("hero", { title: v })} multiline />
-          <Field label="Body" value={content.hero.body} onChange={(v) => update("hero", { body: v })} multiline />
-          <Field label="CTA label" value={content.hero.ctaLabel} onChange={(v) => update("hero", { ctaLabel: v })} />
-          <ImageField label="Hero image" value={content.hero.image} onChange={(v) => update("hero", { image: v })} />
-        </SectionCard>
-
-        <SectionCard title="Journey section">
-          <Field label="Eyebrow" value={content.journey.eyebrow} onChange={(v) => update("journey", { eyebrow: v })} />
-          <Field label="Title" value={content.journey.title} onChange={(v) => update("journey", { title: v })} />
-          <Field label="Body" value={content.journey.body} onChange={(v) => update("journey", { body: v })} multiline />
-
-          <div className="grid gap-4 md:grid-cols-3">
-            <Field label="Founder initials" value={content.journey.founderInitials} onChange={(v) => update("journey", { founderInitials: v })} />
-            <Field label="Founder role" value={content.journey.founderRole} onChange={(v) => update("journey", { founderRole: v })} />
-            <Field label="Founder name" value={content.journey.founderName} onChange={(v) => update("journey", { founderName: v })} />
-          </div>
-        </SectionCard>
-
-        <SectionCard title="Deals section">
-          <Field label="Eyebrow" value={content.deals.eyebrow} onChange={(v) => update("deals", { eyebrow: v })} />
-          <Field label="Title" value={content.deals.title} onChange={(v) => update("deals", { title: v })} />
-          <Field label="Price badge" value={content.deals.priceLabel} onChange={(v) => update("deals", { priceLabel: v })} />
-          <Field label="CTA label" value={content.deals.ctaLabel} onChange={(v) => update("deals", { ctaLabel: v })} />
-          <ImageField label="Deal image" value={content.deals.image} onChange={(v) => update("deals", { image: v })} />
-        </SectionCard>
+        <HeroEditor content={content} update={update} />
+        <ServicesEditor content={content} update={update} />
+        <CategoriesEditor content={content} update={update} />
+        <ProductsEditor content={content} update={update} />
+        <ContactEditor content={content} update={update} />
       </div>
     </div>
   );
 }
 
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+type UpdateFn = <K extends keyof SiteContent>(
+  section: K,
+  patch: Partial<SiteContent[K]>
+) => void;
+
+function HeroEditor({
+  content,
+  update,
+}: {
+  content: SiteContent;
+  update: UpdateFn;
+}) {
+  return (
+    <SectionCard title="Hero section">
+      <Field
+        label="Eyebrow"
+        value={content.hero.eyebrow}
+        onChange={(v) => update("hero", { eyebrow: v })}
+      />
+
+      <Field
+        label="Title"
+        value={content.hero.title}
+        onChange={(v) => update("hero", { title: v })}
+        multiline
+      />
+
+      <Field
+        label="Body"
+        value={content.hero.body}
+        onChange={(v) => update("hero", { body: v })}
+        multiline
+      />
+
+      <Field
+        label="CTA label"
+        value={content.hero.ctaLabel}
+        onChange={(v) => update("hero", { ctaLabel: v })}
+      />
+
+      <ImageField
+        label="Hero image"
+        value={content.hero.image}
+        onChange={(v) => update("hero", { image: v })}
+      />
+    </SectionCard>
+  );
+}
+
+function ServicesEditor({
+  content,
+  update,
+}: {
+  content: SiteContent;
+  update: UpdateFn;
+}) {
+  const services = content.services.items;
+
+  return (
+    <SectionCard title="Services section">
+      <Field
+        label="Eyebrow"
+        value={content.services.eyebrow}
+        onChange={(v) => update("services", { eyebrow: v })}
+      />
+
+      <Field
+        label="Title"
+        value={content.services.title}
+        onChange={(v) => update("services", { title: v })}
+      />
+
+      <div className="space-y-4">
+        {services.map((service, index) => (
+          <div
+            key={`${service.title}-${index}`}
+            className="rounded-md border border-border p-4"
+          >
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <h3 className="font-display text-xl">Service {index + 1}</h3>
+
+              <button
+                type="button"
+                onClick={() => {
+                  update("services", {
+                    items: services.filter((_, itemIndex) => itemIndex !== index),
+                  });
+                }}
+                className="inline-flex items-center gap-2 rounded border border-destructive px-3 py-2 text-xs font-semibold uppercase tracking-widest text-destructive hover:bg-destructive hover:text-destructive-foreground"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Remove
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <Field
+                label="Icon"
+                value={service.icon}
+                onChange={(v) => {
+                  const items = [...services];
+                  items[index] = { ...items[index], icon: v };
+                  update("services", { items });
+                }}
+              />
+
+              <Field
+                label="Title"
+                value={service.title}
+                onChange={(v) => {
+                  const items = [...services];
+                  items[index] = { ...items[index], title: v };
+                  update("services", { items });
+                }}
+              />
+
+              <Field
+                label="Points - one per line"
+                value={service.points.join("\n")}
+                multiline
+                onChange={(v) => {
+                  const items = [...services];
+                  items[index] = {
+                    ...items[index],
+                    points: v
+                      .split("\n")
+                      .map((point) => point.trim())
+                      .filter(Boolean),
+                  };
+                  update("services", { items });
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={() =>
+          update("services", {
+            items: [
+              ...services,
+              {
+                icon: "🌱",
+                title: "New Service",
+                points: ["Describe this service here."],
+              },
+            ],
+          })
+        }
+        className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-leaf-deep"
+      >
+        <Plus className="h-4 w-4" />
+        Add service
+      </button>
+    </SectionCard>
+  );
+}
+
+function CategoriesEditor({
+  content,
+  update,
+}: {
+  content: SiteContent;
+  update: UpdateFn;
+}) {
+  const categories = content.categories.items;
+
+  return (
+    <SectionCard title="Categories section">
+      <Field
+        label="Eyebrow"
+        value={content.categories.eyebrow}
+        onChange={(v) => update("categories", { eyebrow: v })}
+      />
+
+      <Field
+        label="Title"
+        value={content.categories.title}
+        onChange={(v) => update("categories", { title: v })}
+      />
+
+      <div className="space-y-4">
+        {categories.map((category, index) => (
+          <div
+            key={`${category.name}-${index}`}
+            className="rounded-md border border-border p-4"
+          >
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <h3 className="font-display text-xl">Category {index + 1}</h3>
+
+              <button
+                type="button"
+                onClick={() => {
+                  update("categories", {
+                    items: categories.filter(
+                      (_, itemIndex) => itemIndex !== index
+                    ),
+                  });
+                }}
+                className="inline-flex items-center gap-2 rounded border border-destructive px-3 py-2 text-xs font-semibold uppercase tracking-widest text-destructive hover:bg-destructive hover:text-destructive-foreground"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Remove
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <Field
+                label="Name"
+                value={category.name}
+                onChange={(v) => {
+                  const items = [...categories];
+                  items[index] = { ...items[index], name: v };
+                  update("categories", { items });
+                }}
+              />
+
+              <Field
+                label="Product count"
+                value={String(category.count)}
+                onChange={(v) => {
+                  const items = [...categories];
+                  items[index] = {
+                    ...items[index],
+                    count: Number(v) || 0,
+                  };
+                  update("categories", { items });
+                }}
+              />
+
+              <ImageField
+                label="Category image"
+                value={category.image}
+                onChange={(v) => {
+                  const items = [...categories];
+                  items[index] = { ...items[index], image: v };
+                  update("categories", { items });
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={() =>
+          update("categories", {
+            items: [
+              ...categories,
+              {
+                name: "New Category",
+                count: 0,
+                image: content.hero.image,
+              },
+            ],
+          })
+        }
+        className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-leaf-deep"
+      >
+        <Plus className="h-4 w-4" />
+        Add category
+      </button>
+    </SectionCard>
+  );
+}
+
+function ProductsEditor({
+  content,
+  update,
+}: {
+  content: SiteContent;
+  update: UpdateFn;
+}) {
+  return (
+    <SectionCard title="Products section">
+      <Field
+        label="All products tab"
+        value={content.productsSection.allLabel}
+        onChange={(v) => update("productsSection", { allLabel: v })}
+      />
+
+      <Field
+        label="New arrivals tab"
+        value={content.productsSection.newLabel}
+        onChange={(v) => update("productsSection", { newLabel: v })}
+      />
+
+      <Field
+        label="Sale tab"
+        value={content.productsSection.saleLabel}
+        onChange={(v) => update("productsSection", { saleLabel: v })}
+      />
+    </SectionCard>
+  );
+}
+
+function ContactEditor({
+  content,
+  update,
+}: {
+  content: SiteContent;
+  update: UpdateFn;
+}) {
+  return (
+    <SectionCard title="Contact section">
+      <Field
+        label="Eyebrow"
+        value={content.contact.eyebrow}
+        onChange={(v) => update("contact", { eyebrow: v })}
+      />
+
+      <Field
+        label="Title"
+        value={content.contact.title}
+        onChange={(v) => update("contact", { title: v })}
+      />
+
+      <Field
+        label="Body"
+        value={content.contact.body}
+        multiline
+        onChange={(v) => update("contact", { body: v })}
+      />
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <Field
+          label="Phone"
+          value={content.contact.phone}
+          onChange={(v) => update("contact", { phone: v })}
+        />
+
+        <Field
+          label="Email"
+          value={content.contact.email}
+          onChange={(v) => update("contact", { email: v })}
+        />
+
+        <Field
+          label="Location"
+          value={content.contact.location}
+          onChange={(v) => update("contact", { location: v })}
+        />
+      </div>
+
+      <Field
+        label="Form title"
+        value={content.contact.formTitle}
+        onChange={(v) => update("contact", { formTitle: v })}
+      />
+
+      <Field
+        label="Button label"
+        value={content.contact.buttonLabel}
+        onChange={(v) => update("contact", { buttonLabel: v })}
+      />
+    </SectionCard>
+  );
+}
+
+function SectionCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="rounded-lg border border-border bg-card p-6">
       <h2 className="font-display text-2xl">{title}</h2>
@@ -94,7 +440,7 @@ function Field({
         <textarea
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          rows={3}
+          rows={4}
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
         />
       ) : (
@@ -148,7 +494,10 @@ function ImageField({
               className="hidden"
               onChange={async (event) => {
                 const file = event.target.files?.[0];
-                if (file) onChange(await fileToDataUrl(file));
+
+                if (file) {
+                  onChange(await fileToDataUrl(file));
+                }
               }}
             />
           </label>
@@ -157,5 +506,3 @@ function ImageField({
     </div>
   );
 }
-
-export type _SiteContent = SiteContent;

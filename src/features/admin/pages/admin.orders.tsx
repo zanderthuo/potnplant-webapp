@@ -99,7 +99,7 @@ export default function OrdersAdmin() {
                   </span>
                 </td>
 
-                <td className="px-4 py-3 text-right font-semibold">${order.total}.00</td>
+                <td className="px-4 py-3 text-right font-semibold">Ksh. {order.total}.00</td>
               </tr>
             ))}
           </tbody>

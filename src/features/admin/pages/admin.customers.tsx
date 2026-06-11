@@ -45,7 +45,7 @@ export default function CustomersAdmin() {
                 </td>
 
                 <td className="px-4 py-3">{customer.orders}</td>
-                <td className="px-4 py-3 font-semibold">${customer.spent}.00</td>
+                <td className="px-4 py-3 font-semibold">Ksh. {customer.spent}.00</td>
                 <td className="px-4 py-3 text-muted-foreground">{customer.since}</td>
               </tr>
             ))}

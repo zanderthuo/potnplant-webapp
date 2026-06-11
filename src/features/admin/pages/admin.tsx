@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, ShoppingBag, Users, Settings, Leaf, ArrowLeft, FileText } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingBag, Users, Settings, ArrowLeft, FileText } from "lucide-react";
 import logo from "../../../assets/logo.jpeg";
 
 const nav = [

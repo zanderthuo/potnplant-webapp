@@ -10,6 +10,8 @@ const navigation = [
 ];
 
 export function SiteFooter() {
+
+  const currentYear = new Date().getFullYear();
   return (
     <footer className="mt-24 border-t border-border bg-background">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-3">
@@ -22,7 +24,7 @@ export function SiteFooter() {
             />
 
             <span className="font-display text-2xl tracking-[0.24em]">
-              POTNPLANT
+              POTnPLANT
             </span>
           </div>
 
@@ -38,7 +40,7 @@ export function SiteFooter() {
               href="tel:+254700000000"
               className="font-medium hover:text-primary"
             >
-              (+254) 788 727 645
+              (+254) 143 513 999
             </a>
           </p>
 
@@ -97,7 +99,15 @@ export function SiteFooter() {
       </div>
 
       <div className="bg-foreground py-5 text-center text-xs text-background/80">
-        Copyright © 2026 PotnPlant — All Rights Reserved
+        © {currentYear} PotnPlant | Made with ❤️ by{" "}
+        <a
+          href="https://craftzander-website.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium hover:text-primary"
+        >
+          craftzander
+        </a>
       </div>
     </footer>
   );
