@@ -24,16 +24,18 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
         )}
 
-        <img
-          src={product.image}
-          alt={product.name}
-          loading="lazy"
-          width={800}
-          height={800}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
+        <a href={productUrl} className="block h-full w-full">
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            width={800}
+            height={800}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        </a>
 
-        <div className="absolute right-3 top-3 flex translate-x-12 flex-col gap-2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+        <div className="absolute right-3 top-3 flex flex-col gap-2 opacity-100 md:translate-x-12 md:opacity-0 md:transition-all md:duration-300 md:group-hover:translate-x-0 md:group-hover:opacity-100">
           <button
             type="button"
             className="grid h-10 w-10 place-items-center bg-card text-foreground shadow-sm hover:text-primary"
@@ -59,24 +61,21 @@ export function ProductCard({ product }: { product: Product }) {
         <button
           type="button"
           onClick={() => add(product.id)}
-          className="absolute inset-x-0 bottom-0 translate-y-full bg-primary py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground transition-transform duration-300 group-hover:translate-y-0"
+          className="absolute inset-x-0 bottom-0 translate-y-0 bg-primary py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground transition-transform duration-300 md:translate-y-full md:group-hover:translate-y-0"
         >
           Add to cart
         </button>
       </div>
 
       <div className="mt-5 text-center">
-        <a
-          href={productUrl}
-          className="font-display text-lg hover:text-primary"
-        >
+        <a href={productUrl} className="font-display text-lg hover:text-primary">
           {product.name}
         </a>
 
         <div className="mt-1 flex items-center justify-center gap-2 text-sm">
           {product.compareAt && (
             <span className="text-muted-foreground line-through">
-              Ksh{product.compareAt}.00
+              Ksh. {product.compareAt}.00
             </span>
           )}
 
