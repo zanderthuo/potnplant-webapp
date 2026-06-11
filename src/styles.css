@@ -1,0 +1,134 @@
+@import "tailwindcss";
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-leaf: var(--leaf);
+  --color-leaf-deep: var(--leaf-deep);
+  --color-sun: var(--sun);
+  --color-clay: var(--clay);
+  --color-sand: var(--sand);
+  --color-bark: var(--bark);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.5rem;
+
+  /* Plant shop palette inspired by potnplant logo */
+  --leaf: oklch(0.52 0.13 145);          /* fresh garden green */
+  --leaf-deep: oklch(0.32 0.07 150);     /* deep forest */
+  --sun: oklch(0.84 0.16 92);            /* golden yellow */
+  --clay: oklch(0.62 0.14 45);           /* terracotta */
+  --sand: oklch(0.97 0.012 85);          /* warm off-white */
+  --bark: oklch(0.22 0.02 80);           /* near-black ink */
+
+  --background: var(--sand);
+  --foreground: var(--bark);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--bark);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--bark);
+  --primary: var(--leaf);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.94 0.015 90);
+  --secondary-foreground: var(--bark);
+  --muted: oklch(0.95 0.012 90);
+  --muted-foreground: oklch(0.48 0.02 80);
+  --accent: var(--sun);
+  --accent-foreground: var(--bark);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.9 0.015 85);
+  --input: oklch(0.92 0.012 85);
+  --ring: var(--leaf);
+
+  --sidebar: oklch(0.99 0.005 90);
+  --sidebar-foreground: var(--bark);
+  --sidebar-primary: var(--leaf-deep);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.95 0.012 90);
+  --sidebar-accent-foreground: var(--bark);
+  --sidebar-border: oklch(0.9 0.015 85);
+  --sidebar-ring: var(--leaf);
+}
+
+.dark {
+  --background: oklch(0.18 0.015 150);
+  --foreground: oklch(0.96 0.01 85);
+  --card: oklch(0.22 0.02 150);
+  --card-foreground: oklch(0.96 0.01 85);
+  --popover: oklch(0.22 0.02 150);
+  --popover-foreground: oklch(0.96 0.01 85);
+  --primary: var(--leaf);
+  --primary-foreground: oklch(0.15 0.02 150);
+  --secondary: oklch(0.28 0.025 150);
+  --secondary-foreground: oklch(0.96 0.01 85);
+  --muted: oklch(0.26 0.02 150);
+  --muted-foreground: oklch(0.72 0.02 85);
+  --accent: var(--sun);
+  --accent-foreground: oklch(0.18 0.02 150);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html { font-family: var(--font-sans); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .eyebrow {
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.72rem;
+    color: var(--color-primary);
+  }
+}
