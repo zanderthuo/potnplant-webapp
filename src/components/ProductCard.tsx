@@ -1,11 +1,12 @@
 import { Search } from "lucide-react";
 import type { Product } from "../lib/products";
 import { useCart } from "../lib/cart";
+import { getImageUrl } from "../lib/image";
 
 export function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
 
-  const productUrl = `/product/${product.slug}`;
+  const productUrl = `/product/${product.id}`;
 
   return (
     <div className="group">
@@ -26,7 +27,7 @@ export function ProductCard({ product }: { product: Product }) {
 
         <a href={productUrl} className="block h-full w-full">
           <img
-            src={product.image}
+            src={getImageUrl(product.image)}
             alt={product.name}
             loading="lazy"
             width={800}
@@ -42,7 +43,6 @@ export function ProductCard({ product }: { product: Product }) {
           >
             <Search className="h-4 w-4" />
           </a>
-
         </div>
 
         <button
@@ -60,13 +60,16 @@ export function ProductCard({ product }: { product: Product }) {
         </a>
 
         <div className="mt-1 flex items-center justify-center gap-2 text-sm">
-          {product.compareAt && (
+          {/* Synchronized with 'oldPrice' field from your backend response payload */}
+          {product.oldPrice && (
             <span className="text-muted-foreground line-through">
-              Ksh. {product.compareAt}.00
+              Ksh. {parseFloat(product.oldPrice as unknown as string).toLocaleString()}.00
             </span>
           )}
 
-          <span className="font-semibold">Ksh. {product.price}.00</span>
+          <span className="font-semibold">
+            Ksh. {parseFloat(product.price as unknown as string).toLocaleString()}.00
+          </span>
         </div>
       </div>
     </div>

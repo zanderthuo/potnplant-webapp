@@ -1,41 +1,55 @@
 import { Mail, MapPin, Phone, ChevronLeft, ChevronRight } from "lucide-react";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 
 import catTerrarium from "../../../assets/cat-terrarium.jpg";
 import catSucculents from "../../../assets/cat-succulents.jpg";
 import catPotter from "../../../assets/cat-potter.jpg";
 import catHanging from "../../../assets/cat-hanging.jpg";
 
-import { products, type Product } from "../../../lib/products";
+import type { Product } from "../../../lib/products";
 import { ProductCard } from "../../../components/ProductCard";
 import { StoreLayout } from "../../../components/layout/StoreLayout";
 import { useContent, type SiteContent } from "../../../lib/content";
-
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { fetchProducts } from "../store/productsSlice";
 
 type ProductTab = "all" | "new" | "sale";
 
 const PRODUCTS_PER_PAGE = 8;
 
 export default function HomePage() {
+  const dispatch = useAppDispatch();
+  const { items, loading, error } = useAppSelector((state) => state.products);
+
   const [tab, setTab] = useState<ProductTab>("all");
 
   const { content } = useContent();
   const { hero } = content;
 
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
   const list = useMemo(() => {
-    return products.filter((product) => {
+    return items.filter((product) => {
       if (tab === "all") return true;
       if (tab === "sale") return product.tag === "SALE";
       return product.tag === "NEW";
     });
-  }, [tab]);
+  }, [items, tab]);
 
   return (
     <StoreLayout>
       <HeroSection hero={hero} />
       <OurServices />
       <CategorySection />
-      <ProductsSection tab={tab} setTab={setTab} products={list} />
+      <ProductsSection
+        tab={tab}
+        setTab={setTab}
+        products={list}
+        loading={loading}
+        error={error}
+      />
       <ContactSection />
     </StoreLayout>
   );
@@ -124,14 +138,7 @@ function OurServices() {
     <section id="services" className="mx-auto max-w-7xl scroll-mt-24 px-6 py-24">
       <div className="text-center">
         <p className="eyebrow">What We Offer</p>
-
         <h2 className="mt-3 font-display text-5xl">Our Services</h2>
-
-        {/* <p className="mx-auto mt-6 max-w-2xl text-muted-foreground">
-          We provide quality plants, professional plant care services, gardening
-          support, and beautiful green solutions for homes, offices, events, and
-          outdoor spaces.
-        </p> */}
       </div>
 
       <div className="mt-16 grid gap-8 md:grid-cols-3">
@@ -219,10 +226,14 @@ function ProductsSection({
   tab,
   setTab,
   products,
+  loading,
+  error,
 }: {
   tab: ProductTab;
   setTab: (tab: ProductTab) => void;
   products: Product[];
+  loading: boolean;
+  error: string | null;
 }) {
   const [page, setPage] = useState(1);
 
@@ -231,6 +242,10 @@ function ProductsSection({
     { key: "new", label: "New Arrivals" },
     { key: "sale", label: "Sale" },
   ];
+
+  useEffect(() => {
+    setPage(1);
+  }, [tab, products.length]);
 
   const totalPages = Math.max(1, Math.ceil(products.length / PRODUCTS_PER_PAGE));
 
@@ -266,53 +281,75 @@ function ProductsSection({
         ))}
       </div>
 
-      <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-        {paginatedProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {loading && (
+        <p className="mt-12 text-center text-muted-foreground">
+          Loading products...
+        </p>
+      )}
 
-      {totalPages > 1 && (
-        <div className="mt-12 flex items-center justify-center gap-2">
-          <button
-            type="button"
-            disabled={page === 1}
-            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Prev
-          </button>
+      {!loading && error && (
+        <p className="mt-12 text-center text-destructive">{error}</p>
+      )}
 
-          {Array.from({ length: totalPages }).map((_, index) => {
-            const pageNumber = index + 1;
+      {!loading && !error && products.length === 0 && (
+        <p className="mt-12 text-center text-muted-foreground">
+          No products found.
+        </p>
+      )}
 
-            return (
+      {!loading && !error && products.length > 0 && (
+        <>
+          <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+            {paginatedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="mt-12 flex items-center justify-center gap-2">
               <button
-                key={pageNumber}
                 type="button"
-                onClick={() => setPage(pageNumber)}
-                className={`grid h-10 w-10 place-items-center border text-sm transition ${
-                  page === pageNumber
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border hover:bg-muted"
-                }`}
+                disabled={page === 1}
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
               >
-                {pageNumber}
+                <ChevronLeft className="h-4 w-4" />
+                Prev
               </button>
-            );
-          })}
 
-          <button
-            type="button"
-            disabled={page === totalPages}
-            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-            className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
-          >
-            Next
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
+              {Array.from({ length: totalPages }).map((_, index) => {
+                const pageNumber = index + 1;
+
+                return (
+                  <button
+                    key={pageNumber}
+                    type="button"
+                    onClick={() => setPage(pageNumber)}
+                    className={`grid h-10 w-10 place-items-center border text-sm transition ${
+                      page === pageNumber
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border hover:bg-muted"
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
+
+              <button
+                type="button"
+                disabled={page === totalPages}
+                onClick={() =>
+                  setPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </>
       )}
     </section>
   );

@@ -1,53 +1,142 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { products, categories } from "../../../lib/products";
+import { categories } from "../../../lib/products";
+import type { Product } from "../../../lib/products";
 import { ProductCard } from "../../../components/ProductCard";
 import { StoreLayout } from "../../../components/layout/StoreLayout";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { fetchProducts } from "../store/productsSlice";
 
 const PRODUCTS_PER_PAGE = 6;
+type SortType = "default" | "price-asc" | "price-desc";
+
+type ApiCategory =
+  | string
+  | {
+      id: string;
+      name: string;
+      slug?: string;
+      description?: string;
+      image?: string;
+      isActive?: boolean;
+      createdAt?: string;
+      updatedAt?: string;
+    };
+
+type ProductWithApiCategory = Omit<Product, "category"> & {
+  category: ApiCategory;
+};
+
+function getCategoryName(category: ApiCategory): string {
+  if (typeof category === "string") {
+    return category;
+  }
+  return category.name;
+}
 
 export default function ShopPage() {
+  const dispatch = useAppDispatch();
+  const { items, loading, error } = useAppSelector((state) => state.products);
+
   const [cat, setCat] = useState<string>("All");
-  const [sort, setSort] = useState<"default" | "price-asc" | "price-desc">(
-    "default"
-  );
+  const [sort, setSort] = useState<SortType>("default");
   const [page, setPage] = useState(1);
 
-  const cats = ["All", ...Array.from(new Set(products.map((p) => p.category)))];
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
-  const filtered = useMemo(() => {
+  // Safely map incoming products to normalize category field as string
+  const products = useMemo<Product[]>(() => {
+    return (items as ProductWithApiCategory[]).map((product) => ({
+      ...product,
+      category: getCategoryName(product.category) as Product["category"],
+    }));
+  }, [items]);
+
+  // Extract unique active categories from the items
+  const cats = useMemo<string[]>(() => {
+    const productCategories = products.map((product) => product.category);
+    return ["All", ...Array.from(new Set(productCategories))];
+  }, [products]);
+
+  // Generate category pill details and counts
+  const categoryCounts = useMemo(() => {
+    const dynamicCategories = cats
+      .filter((category) => category !== "All")
+      .map((category) => ({
+        name: category,
+        count: products.filter((product) => product.category === category).length,
+      }));
+
+    if (dynamicCategories.length > 0) {
+      return dynamicCategories;
+    }
+
+    return categories.map((category) => ({
+      ...category,
+      count: products.filter((product) => product.category === category.name).length,
+    }));
+  }, [cats, products]);
+
+  // Filter and sort products securely parsing prices to float values
+  const filtered = useMemo<Product[]>(() => {
     return [...products]
       .filter((product) => cat === "All" || product.category === cat)
       .sort((a, b) => {
-        if (sort === "price-asc") return a.price - b.price;
-        if (sort === "price-desc") return b.price - a.price;
+        const priceA = parseFloat(a.price as unknown as string);
+        const priceB = parseFloat(b.price as unknown as string);
+        if (sort === "price-asc") return priceA - priceB;
+        if (sort === "price-desc") return priceB - priceA;
         return 0;
       });
-  }, [cat, sort]);
+  }, [products, cat, sort]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PRODUCTS_PER_PAGE));
 
-  const paginatedProducts = filtered.slice(
-    (page - 1) * PRODUCTS_PER_PAGE,
-    page * PRODUCTS_PER_PAGE
-  );
+  const paginatedProducts = useMemo<Product[]>(() => {
+    return filtered.slice(
+      (page - 1) * PRODUCTS_PER_PAGE,
+      page * PRODUCTS_PER_PAGE
+    );
+  }, [filtered, page]);
 
   const handleCategoryChange = (category: string) => {
     setCat(category);
     setPage(1);
   };
 
-  const handleSortChange = (value: typeof sort) => {
+  const handleSortChange = (value: SortType) => {
     setSort(value);
     setPage(1);
   };
 
+  if (loading) {
+    return (
+      <StoreLayout>
+        <div className="mx-auto max-w-7xl px-6 py-24">
+          <p className="text-muted-foreground">Loading products...</p>
+        </div>
+      </StoreLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <StoreLayout>
+        <div className="mx-auto max-w-7xl px-6 py-24">
+          <p className="text-destructive">{error}</p>
+        </div>
+      </StoreLayout>
+    );
+  }
+
   return (
     <StoreLayout>
+      {/* Hero Header */}
       <div className="bg-secondary/60">
         <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
           <h1 className="font-display text-5xl md:text-6xl">Shop</h1>
-
           <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
             <a href="/" className="hover:text-foreground">
               Home
@@ -59,6 +148,7 @@ export default function ShopPage() {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-10">
+        {/* Controls Bar */}
         <div className="space-y-5 border-b border-border pb-6 lg:flex lg:items-center lg:justify-between lg:gap-6 lg:space-y-0">
           <div className="-mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
             <div className="flex min-w-max gap-3 pb-1 text-sm lg:flex-wrap lg:gap-6">
@@ -81,9 +171,7 @@ export default function ShopPage() {
 
           <select
             value={sort}
-            onChange={(event) =>
-              handleSortChange(event.target.value as typeof sort)
-            }
+            onChange={(event) => handleSortChange(event.target.value as SortType)}
             className="w-full border border-border bg-card px-4 py-3 text-sm outline-none focus:border-primary sm:w-auto"
           >
             <option value="default">Default sorting</option>
@@ -92,12 +180,13 @@ export default function ShopPage() {
           </select>
         </div>
 
+        {/* Layout Content */}
         <div className="mt-8 grid gap-8 lg:mt-10 lg:grid-cols-[240px_1fr]">
+          {/* Sidebar */}
           <aside className="rounded-2xl border border-border bg-card p-5 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0">
             <h3 className="font-display text-2xl">Categories</h3>
-
             <ul className="mt-6 space-y-3 text-sm">
-              {categories.map((category) => (
+              {categoryCounts.map((category) => (
                 <li key={category.name}>
                   <button
                     type="button"
@@ -116,6 +205,7 @@ export default function ShopPage() {
             </ul>
           </aside>
 
+          {/* Product Feed Grid */}
           <div>
             <div className="mb-6 flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
               <p>
@@ -129,13 +219,9 @@ export default function ShopPage() {
                 </span>{" "}
                 products
               </p>
-
               <p>
                 Page <span className="font-medium text-foreground">{page}</span>{" "}
-                of{" "}
-                <span className="font-medium text-foreground">
-                  {totalPages}
-                </span>
+                of <span className="font-medium text-foreground">{totalPages}</span>
               </p>
             </div>
 
@@ -145,6 +231,7 @@ export default function ShopPage() {
               ))}
             </div>
 
+            {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="mt-12 flex flex-wrap items-center justify-center gap-2">
                 <button
@@ -153,13 +240,11 @@ export default function ShopPage() {
                   onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
                   className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Prev
+                  <ChevronLeft className="h-4 w-4" /> Prev
                 </button>
 
                 {Array.from({ length: totalPages }).map((_, index) => {
                   const pageNumber = index + 1;
-
                   return (
                     <button
                       key={pageNumber}
@@ -179,13 +264,10 @@ export default function ShopPage() {
                 <button
                   type="button"
                   disabled={page === totalPages}
-                  onClick={() =>
-                    setPage((prev) => Math.min(prev + 1, totalPages))
-                  }
+                  onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
                   className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
                 >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
+                  Next <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
             )}
