@@ -1,18 +1,67 @@
+import { useEffect } from "react";
 import { Minus, Plus, X } from "lucide-react";
-import { useCart } from "../../../lib/cart";
+
 import { StoreLayout } from "../../../components/layout/StoreLayout";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { fetchProducts } from "../store/productsSlice";
+import {
+  clearCart,
+  removeFromCart,
+  setCartQty,
+} from "../store/cartSlice";
+import { getImageUrl } from "../../../lib/image";
 
 export default function CartPage() {
-  const { detailed, setQty, remove, subtotal, clear } = useCart();
+  const dispatch = useAppDispatch();
 
-  const shipping = detailed.length ? 0 : 0;
+  const cartItems = useAppSelector((state) => state.cart.items);
+  const { items: products, loading } = useAppSelector(
+    (state) => state.products
+  );
+
+  useEffect(() => {
+    if (!products.length) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, products.length]);
+
+  const detailed = Object.entries(cartItems)
+    .map(([productId, qty]) => {
+      const product = products.find((item) => item.id === productId);
+
+      if (!product) return null;
+
+      return { product, qty };
+    })
+    .filter(Boolean) as {
+    product: (typeof products)[number];
+    qty: number;
+  }[];
+
+  const subtotal = detailed.reduce(
+    (total, item) => total + Number(item.product.price) * item.qty,
+    0
+  );
+
+  const shipping = 0;
   const total = subtotal + shipping;
+
+  if (loading) {
+    return (
+      <StoreLayout>
+        <div className="mx-auto max-w-3xl px-6 py-24 text-center">
+          <h1 className="font-display text-5xl">Loading cart...</h1>
+        </div>
+      </StoreLayout>
+    );
+  }
 
   if (!detailed.length) {
     return (
       <StoreLayout>
         <div className="mx-auto max-w-3xl px-6 py-24 text-center">
           <h1 className="font-display text-5xl">Your cart is empty</h1>
+
           <p className="mt-4 text-muted-foreground">
             Fill it with friends from the greenhouse.
           </p>
@@ -35,21 +84,14 @@ export default function CartPage() {
 
         <div className="mt-10 grid gap-12 lg:grid-cols-[1fr_360px]">
           <div>
-            <div className="hidden grid-cols-[1fr_120px_140px_40px] gap-4 border-b border-border pb-3 text-xs uppercase tracking-widest text-muted-foreground md:grid">
-              <span>Product</span>
-              <span>Quantity</span>
-              <span className="text-right">Total</span>
-              <span />
-            </div>
-
             {detailed.map(({ product, qty }) => (
               <div
                 key={product.id}
                 className="grid grid-cols-[80px_1fr_40px] items-center gap-4 border-b border-border py-6 md:grid-cols-[1fr_120px_140px_40px]"
               >
-                <div className="flex items-center gap-4 md:col-span-1">
+                <div className="flex items-center gap-4">
                   <img
-                    src={product.image}
+                    src={getImageUrl(product.image)}
                     alt={product.name}
                     className="h-20 w-20 object-cover"
                   />
@@ -57,7 +99,7 @@ export default function CartPage() {
                   <div>
                     <p className="font-display text-lg">{product.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      Ksh. {product.price}.00
+                      Ksh. {Number(product.price).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -65,7 +107,14 @@ export default function CartPage() {
                 <div className="col-span-3 flex items-center border border-border md:col-span-1 md:w-fit">
                   <button
                     type="button"
-                    onClick={() => setQty(product.id, qty - 1)}
+                    onClick={() =>
+                      dispatch(
+                        setCartQty({
+                          productId: product.id,
+                          quantity: qty - 1,
+                        })
+                      )
+                    }
                     className="grid h-10 w-10 place-items-center hover:bg-muted"
                   >
                     <Minus className="h-3 w-3" />
@@ -75,7 +124,14 @@ export default function CartPage() {
 
                   <button
                     type="button"
-                    onClick={() => setQty(product.id, qty + 1)}
+                    onClick={() =>
+                      dispatch(
+                        setCartQty({
+                          productId: product.id,
+                          quantity: qty + 1,
+                        })
+                      )
+                    }
                     className="grid h-10 w-10 place-items-center hover:bg-muted"
                   >
                     <Plus className="h-3 w-3" />
@@ -83,12 +139,12 @@ export default function CartPage() {
                 </div>
 
                 <p className="text-right font-semibold">
-                  Ksh. {(product.price * qty).toFixed(2)}
+                  Ksh. {(Number(product.price) * qty).toFixed(2)}
                 </p>
 
                 <button
                   type="button"
-                  onClick={() => remove(product.id)}
+                  onClick={() => dispatch(removeFromCart(product.id))}
                   className="grid h-8 w-8 place-items-center text-muted-foreground hover:text-destructive"
                 >
                   <X className="h-4 w-4" />
@@ -103,7 +159,7 @@ export default function CartPage() {
 
               <button
                 type="button"
-                onClick={clear}
+                onClick={() => dispatch(clearCart())}
                 className="text-sm text-muted-foreground hover:text-destructive"
               >
                 Clear cart
@@ -120,11 +176,6 @@ export default function CartPage() {
                 <dd>Ksh. {subtotal.toFixed(2)}</dd>
               </div>
 
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Shipping</dt>
-                <dd>Ksh. {shipping.toFixed(2)}</dd>
-              </div>
-
               <div className="flex justify-between border-t border-border pt-3 text-base">
                 <dt className="font-semibold">Total</dt>
                 <dd className="font-display text-2xl text-primary">
@@ -139,10 +190,6 @@ export default function CartPage() {
             >
               Proceed to checkout
             </a>
-
-            <p className="mt-3 text-xs text-muted-foreground">
-              Taxes calculated at checkout.
-            </p>
           </aside>
         </div>
       </div>

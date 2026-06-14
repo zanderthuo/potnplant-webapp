@@ -20,7 +20,6 @@ const PRODUCTS_PER_PAGE = 8;
 export default function HomePage() {
   const dispatch = useAppDispatch();
   const { items, loading, error } = useAppSelector((state) => state.products);
-
   const [tab, setTab] = useState<ProductTab>("all");
 
   const { content } = useContent();
@@ -42,7 +41,6 @@ export default function HomePage() {
     <StoreLayout>
       <HeroSection hero={hero} />
       <OurServices />
-      <CategorySection />
       <ProductsSection
         tab={tab}
         setTab={setTab}
@@ -57,31 +55,41 @@ export default function HomePage() {
 
 function HeroSection({ hero }: { hero: SiteContent["hero"] }) {
   return (
-    <section id="home" className="relative scroll-mt-24 bg-secondary/60">
-      <div className="mx-auto grid max-w-7xl items-center gap-8 px-6 py-16 md:grid-cols-2 md:py-24">
+    <section id="home" className="relative overflow-hidden scroll-mt-24">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#062d19] via-[#0f4f2b] to-[#18733d]" />
+      <div className="absolute -left-32 top-8 h-96 w-96 rounded-full bg-[#4caf50]/20 blur-3xl" />
+      <div className="absolute right-0 top-0 h-[520px] w-[520px] rounded-full bg-[#f4b400]/20 blur-3xl" />
+      <div className="absolute bottom-[-120px] left-1/2 h-80 w-80 rounded-full bg-[#c86b3c]/15 blur-3xl" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(244,180,0,0.12),transparent_35%)]" />
+
+      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-2 md:py-28">
         <div>
           <div className="flex items-center gap-3">
-            <span className="h-px w-8 bg-primary" />
-            <p className="eyebrow">{hero.eyebrow}</p>
+            <span className="h-px w-8 bg-[#f4b400]" />
+            <p className="text-xs uppercase tracking-[0.25em] text-[#f4d35e]">
+              {hero.eyebrow}
+            </p>
           </div>
 
-          <h1 className="mt-6 whitespace-pre-line font-display text-5xl leading-[1.05] md:text-7xl">
+          <h1 className="mt-6 whitespace-pre-line font-display text-5xl leading-[0.95] text-white md:text-7xl">
             {hero.title}
           </h1>
 
-          <p className="mt-6 max-w-md text-muted-foreground">{hero.body}</p>
+          <p className="mt-6 max-w-md text-base leading-7 text-white/80">
+            {hero.body}
+          </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-6">
+          <div className="mt-10 flex flex-wrap items-center gap-4">
             <a
               href="/shop"
-              className="bg-primary px-8 py-4 text-sm font-semibold uppercase tracking-widest text-primary-foreground transition hover:bg-leaf-deep"
+              className="rounded-md bg-[#f4b400] px-8 py-4 text-sm font-semibold uppercase tracking-widest text-[#062d19] shadow-lg shadow-black/20 transition hover:-translate-y-1 hover:bg-[#ffd35a]"
             >
               {hero.ctaLabel}
             </a>
 
             <a
               href="#services"
-              className="text-sm font-semibold uppercase tracking-widest text-primary hover:underline"
+              className="rounded-md border border-white/20 bg-white/10 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:-translate-y-1 hover:bg-white/20"
             >
               View services
             </a>
@@ -89,16 +97,32 @@ function HeroSection({ hero }: { hero: SiteContent["hero"] }) {
         </div>
 
         <div className="relative">
-          <img
-            src={hero.image}
-            alt="Hero"
-            width={1600}
-            height={1200}
-            className="w-full"
-          />
+          <div className="absolute inset-0 translate-x-5 translate-y-5 rounded-[2rem] bg-[#f4b400]/20" />
+
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-white/10 shadow-2xl shadow-black/30 backdrop-blur">
+            <img
+              src={hero.image}
+              alt="Hero"
+              width={1600}
+              height={1200}
+              className="w-full object-cover"
+            />
+          </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
+  return (
+    <div className="text-center">
+      <p className="text-xs uppercase tracking-[0.25em] text-primary">
+        {eyebrow}
+      </p>
+      <h2 className="mt-3 font-display text-5xl text-[#0f4f2b]">{title}</h2>
+      <div className="mx-auto mt-5 h-1 w-20 rounded-full bg-gradient-to-r from-[#2f7d32] via-[#8bcf7a] to-[#f4b400]" />
+    </div>
   );
 }
 
@@ -135,36 +159,41 @@ function OurServices() {
   ];
 
   return (
-    <section id="services" className="mx-auto max-w-7xl scroll-mt-24 px-6 py-24">
-      <div className="text-center">
-        <p className="eyebrow">What We Offer</p>
-        <h2 className="mt-3 font-display text-5xl">Our Services</h2>
-      </div>
+    <section
+      id="services"
+      className="relative overflow-hidden scroll-mt-24 bg-gradient-to-b from-[#dff1de] via-[#eaf7e8] to-[#f5fbf4] px-6 py-24"
+    >
+      <div className="absolute -left-40 top-20 h-80 w-80 rounded-full bg-[#2f7d32]/15 blur-3xl" />
+      <div className="absolute -right-40 bottom-10 h-80 w-80 rounded-full bg-[#f4b400]/12 blur-3xl" />
 
-      <div className="mt-16 grid gap-8 md:grid-cols-3">
-        {services.map((service) => (
-          <div
-            key={service.title}
-            className="rounded-2xl border border-border bg-card p-8 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
-          >
-            <div className="mb-5 grid h-16 w-16 place-items-center rounded-full bg-primary/10 text-4xl">
-              {service.icon}
+      <div className="relative mx-auto max-w-7xl">
+        <SectionHeader eyebrow="What We Offer" title="Our Services" />
+
+        <div className="mt-16 grid gap-8 md:grid-cols-3">
+          {services.map((service) => (
+            <div
+              key={service.title}
+              className="group rounded-2xl border border-[#2f7d32]/15 bg-white/90 p-8 text-left shadow-sm backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10"
+            >
+              <div className="mb-5 grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-primary/15 to-[#f4b400]/15 text-4xl ring-1 ring-primary/10">
+                {service.icon}
+              </div>
+
+              <h3 className="mb-5 text-xl font-semibold text-[#0f4f2b] group-hover:text-primary">
+                {service.title}
+              </h3>
+
+              <ul className="space-y-3 text-sm leading-6 text-muted-foreground">
+                {service.points.map((point) => (
+                  <li key={point} className="flex gap-3">
+                    <span className="mt-0.5 font-bold text-primary">✓</span>
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-
-            <h3 className="mb-5 text-xl font-semibold text-primary">
-              {service.title}
-            </h3>
-
-            <ul className="space-y-3 text-sm leading-6 text-muted-foreground">
-              {service.points.map((point) => (
-                <li key={point} className="flex gap-3">
-                  <span className="mt-0.5 font-bold text-primary">✓</span>
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -178,45 +207,33 @@ function CategorySection() {
       count: 13,
       className: "md:row-span-2",
     },
-    {
-      img: catSucculents,
-      name: "Outdoor Potted Plants",
-      count: 3,
-    },
-    {
-      img: catPotter,
-      name: "Plant Stands",
-      count: 6,
-    },
-    {
-      img: catHanging,
-      name: "Compost Soil",
-      count: 1,
-    },
-    {
-      img: catPotter,
-      name: "Gardening Tools",
-      count: 6,
-    },
+    { img: catSucculents, name: "Outdoor Potted Plants", count: 3 },
+    { img: catPotter, name: "Plant Stands", count: 6 },
+    { img: catHanging, name: "Compost Soil", count: 1 },
+    { img: catPotter, name: "Gardening Tools", count: 6 },
   ];
 
   return (
-    <section id="categories" className="mx-auto max-w-7xl scroll-mt-24 px-6 py-16">
-      <div className="text-center">
-        <p className="eyebrow">Our Products</p>
-        <h2 className="mt-3 font-display text-5xl">Product Categories</h2>
-      </div>
+    <section
+      id="categories"
+      className="relative overflow-hidden scroll-mt-24 bg-[#e4f4e2] px-6 py-20"
+    >
+      <div className="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-[#2f7d32]/15 blur-3xl" />
 
-      <div className="mt-12 grid gap-4 md:grid-cols-3 md:grid-rows-2">
-        {categories.map((category) => (
-          <CategoryTile
-            key={category.name}
-            img={category.img}
-            name={category.name}
-            count={category.count}
-            className={category.className}
-          />
-        ))}
+      <div className="relative mx-auto max-w-7xl">
+        <SectionHeader eyebrow="Our Products" title="Product Categories" />
+
+        <div className="mt-12 grid gap-4 md:grid-cols-3 md:grid-rows-2">
+          {categories.map((category) => (
+            <CategoryTile
+              key={category.name}
+              img={category.img}
+              name={category.name}
+              count={category.count}
+              className={category.className}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -260,108 +277,131 @@ function ProductsSection({
   };
 
   return (
-    <section id="products" className="mx-auto max-w-7xl scroll-mt-24 px-6 py-16">
-      <div className="flex flex-wrap items-center justify-center gap-10 font-display text-2xl md:text-3xl">
-        {tabs.map((item, index) => (
-          <Fragment key={item.key}>
-            {index > 0 && <span className="text-muted-foreground/40">|</span>}
+    <section
+      id="products"
+      className="relative overflow-hidden scroll-mt-24 bg-gradient-to-b from-[#e2f3df] via-[#edf8eb] to-[#f7fcf6] px-6 py-20"
+    >
+      <div className="absolute -left-32 top-24 h-72 w-72 rounded-full bg-[#2f7d32]/15 blur-3xl" />
+      <div className="absolute right-10 bottom-20 h-72 w-72 rounded-full bg-[#f4b400]/12 blur-3xl" />
 
-            <button
-              type="button"
-              onClick={() => handleTabChange(item.key)}
-              className={
-                tab === item.key
-                  ? "text-foreground"
-                  : "text-muted-foreground/60 hover:text-foreground"
-              }
-            >
-              {item.label}
-            </button>
-          </Fragment>
-        ))}
-      </div>
-
-      {loading && (
-        <p className="mt-12 text-center text-muted-foreground">
-          Loading products...
-        </p>
-      )}
-
-      {!loading && error && (
-        <p className="mt-12 text-center text-destructive">{error}</p>
-      )}
-
-      {!loading && !error && products.length === 0 && (
-        <p className="mt-12 text-center text-muted-foreground">
-          No products found.
-        </p>
-      )}
-
-      {!loading && !error && products.length > 0 && (
-        <>
-          <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-            {paginatedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-
-          {totalPages > 1 && (
-            <div className="mt-12 flex items-center justify-center gap-2">
-              <button
-                type="button"
-                disabled={page === 1}
-                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Prev
-              </button>
-
-              {Array.from({ length: totalPages }).map((_, index) => {
-                const pageNumber = index + 1;
-
-                return (
-                  <button
-                    key={pageNumber}
-                    type="button"
-                    onClick={() => setPage(pageNumber)}
-                    className={`grid h-10 w-10 place-items-center border text-sm transition ${
-                      page === pageNumber
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border hover:bg-muted"
-                    }`}
-                  >
-                    {pageNumber}
-                  </button>
-                );
-              })}
+      <div className="relative mx-auto max-w-7xl">
+        <div className="flex flex-wrap items-center justify-center gap-6 font-display text-2xl md:gap-10 md:text-3xl">
+          {tabs.map((item, index) => (
+            <Fragment key={item.key}>
+              {index > 0 && <span className="text-primary/25">|</span>}
 
               <button
                 type="button"
-                disabled={page === totalPages}
-                onClick={() =>
-                  setPage((prev) => Math.min(prev + 1, totalPages))
+                onClick={() => handleTabChange(item.key)}
+                className={
+                  tab === item.key
+                    ? "text-[#0f4f2b]"
+                    : "text-muted-foreground/70 hover:text-primary"
                 }
-                className="inline-flex h-10 items-center gap-2 border border-border px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 hover:bg-muted"
               >
-                Next
-                <ChevronRight className="h-4 w-4" />
+                {item.label}
               </button>
+            </Fragment>
+          ))}
+        </div>
+
+        <div className="mx-auto mt-5 h-1 w-20 rounded-full bg-gradient-to-r from-[#2f7d32] via-[#8bcf7a] to-[#f4b400]" />
+
+        {loading && (
+          <p className="mt-12 text-center text-muted-foreground">
+            Loading products...
+          </p>
+        )}
+
+        {!loading && error && (
+          <p className="mt-12 text-center text-destructive">{error}</p>
+        )}
+
+        {!loading && !error && products.length === 0 && (
+          <p className="mt-12 text-center text-muted-foreground">
+            No products found.
+          </p>
+        )}
+
+        {!loading && !error && products.length > 0 && (
+          <>
+            <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+              {paginatedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
             </div>
-          )}
-        </>
-      )}
+
+            {totalPages > 1 && (
+              <div className="mt-12 flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  disabled={page === 1}
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  className="inline-flex h-10 items-center gap-2 border border-primary/20 bg-white/70 px-4 text-sm text-[#0f4f2b] backdrop-blur disabled:cursor-not-allowed disabled:opacity-40 hover:bg-primary/10"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Prev
+                </button>
+
+                {Array.from({ length: totalPages }).map((_, index) => {
+                  const pageNumber = index + 1;
+
+                  return (
+                    <button
+                      key={pageNumber}
+                      type="button"
+                      onClick={() => setPage(pageNumber)}
+                      className={`grid h-10 w-10 place-items-center border text-sm transition ${
+                        page === pageNumber
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-primary/20 bg-white/70 text-[#0f4f2b] hover:bg-primary/10"
+                      }`}
+                    >
+                      {pageNumber}
+                    </button>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  disabled={page === totalPages}
+                  onClick={() =>
+                    setPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  className="inline-flex h-10 items-center gap-2 border border-primary/20 bg-white/70 px-4 text-sm text-[#0f4f2b] backdrop-blur disabled:cursor-not-allowed disabled:opacity-40 hover:bg-primary/10"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </section>
   );
 }
 
 function ContactSection() {
   return (
-    <section id="contact" className="scroll-mt-24 bg-muted/60">
-      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 md:grid-cols-2">
+    <section
+      id="contact"
+      className="relative overflow-hidden scroll-mt-24 bg-gradient-to-br from-[#d8eed8] via-[#eaf7e8] to-[#f9f5df]"
+    >
+      <div className="absolute -left-32 top-10 h-80 w-80 rounded-full bg-[#2f7d32]/15 blur-3xl" />
+      <div className="absolute right-0 bottom-0 h-96 w-96 rounded-full bg-[#f4b400]/15 blur-3xl" />
+
+      <div className="relative mx-auto grid max-w-7xl gap-12 px-6 py-20 md:grid-cols-2">
         <div>
-          <p className="eyebrow">Get in touch</p>
-          <h2 className="mt-3 font-display text-5xl">Contact Us</h2>
+          <p className="text-xs uppercase tracking-[0.25em] text-primary">
+            Get in touch
+          </p>
+
+          <h2 className="mt-3 font-display text-5xl text-[#0f4f2b]">
+            Contact Us
+          </h2>
+
+          <div className="mt-5 h-1 w-20 rounded-full bg-gradient-to-r from-[#2f7d32] via-[#8bcf7a] to-[#f4b400]" />
 
           <p className="mt-6 max-w-md text-muted-foreground">
             Need plants for your home, office, event, or garden? Reach out and
@@ -391,37 +431,39 @@ function ContactSection() {
           </div>
         </div>
 
-        <div className="border border-border bg-card p-8">
-          <h3 className="font-display text-2xl">Send us a message</h3>
+        <div className="rounded-2xl border border-[#2f7d32]/15 bg-white/90 p-8 shadow-xl shadow-primary/10 backdrop-blur">
+          <h3 className="font-display text-2xl text-[#0f4f2b]">
+            Send us a message
+          </h3>
 
           <form className="mt-6 space-y-4">
             <input
               type="text"
               placeholder="Your name"
-              className="w-full border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+              className="w-full border border-primary/15 bg-white/80 px-4 py-3 text-sm outline-none focus:border-primary"
             />
 
             <input
               type="email"
               placeholder="Email address"
-              className="w-full border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+              className="w-full border border-primary/15 bg-white/80 px-4 py-3 text-sm outline-none focus:border-primary"
             />
 
             <input
               type="tel"
               placeholder="Phone number"
-              className="w-full border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+              className="w-full border border-primary/15 bg-white/80 px-4 py-3 text-sm outline-none focus:border-primary"
             />
 
             <textarea
               rows={5}
               placeholder="Tell us what you need..."
-              className="w-full border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+              className="w-full border border-primary/15 bg-white/80 px-4 py-3 text-sm outline-none focus:border-primary"
             />
 
             <button
               type="submit"
-              className="w-full bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-leaf-deep"
+              className="w-full rounded-md bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition hover:-translate-y-0.5 hover:bg-leaf-deep"
             >
               Send message
             </button>
@@ -444,7 +486,7 @@ function ContactItem({
   href?: string;
 }) {
   const content = (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 rounded-2xl border border-[#2f7d32]/15 bg-white/70 p-4 shadow-sm backdrop-blur transition hover:border-primary/25 hover:bg-white">
       <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary">
         {icon}
       </div>
@@ -453,14 +495,14 @@ function ContactItem({
         <p className="text-xs uppercase tracking-widest text-muted-foreground">
           {title}
         </p>
-        <p className="mt-1 font-semibold">{value}</p>
+        <p className="mt-1 font-semibold text-[#0f4f2b]">{value}</p>
       </div>
     </div>
   );
 
   if (href) {
     return (
-      <a href={href} className="block hover:text-primary">
+      <a href={href} className="block">
         {content}
       </a>
     );
@@ -483,7 +525,7 @@ function CategoryTile({
   return (
     <a
       href="/shop"
-      className={`group relative block overflow-hidden bg-muted ${className}`}
+      className={`group relative block overflow-hidden rounded-2xl bg-muted shadow-sm ring-1 ring-[#2f7d32]/15 ${className}`}
     >
       <img
         src={img}
@@ -492,8 +534,10 @@ function CategoryTile({
         className="h-full min-h-[260px] w-full object-cover transition duration-700 group-hover:scale-105"
       />
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-card px-6 py-3 text-center shadow-sm">
-        <span className="font-display text-xl">{name}</span>
+      <div className="absolute inset-0 bg-gradient-to-t from-[#062d19]/55 via-transparent to-transparent" />
+
+      <div className="absolute bottom-6 left-1/2 w-[85%] -translate-x-1/2 rounded-xl border border-white/40 bg-white/85 px-6 py-3 text-center shadow-sm backdrop-blur">
+        <span className="font-display text-xl text-[#0f4f2b]">{name}</span>
         <span className="ml-2 text-sm text-muted-foreground">( {count} )</span>
       </div>
     </a>

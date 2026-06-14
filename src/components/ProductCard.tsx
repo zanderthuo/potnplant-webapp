@@ -1,12 +1,27 @@
 import { Search } from "lucide-react";
+
 import type { Product } from "../lib/products";
-import { useCart } from "../lib/cart";
 import { getImageUrl } from "../lib/image";
+import { useAppDispatch } from "../store/hooks";
+import { addToCart } from "../features/shop/store/cartSlice";
 
 export function ProductCard({ product }: { product: Product }) {
-  const { add } = useCart();
+  const dispatch = useAppDispatch();
 
   const productUrl = `/product/${product.id}`;
+
+  const price = Number(product.price);
+  const oldPrice = product.oldPrice ? Number(product.oldPrice) : null;
+
+  const formatPrice = (value: number) =>
+    value.toLocaleString("en-KE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+  const handleAddToCart = () => {
+    dispatch(addToCart(product.id));
+  };
 
   return (
     <div className="group">
@@ -36,10 +51,11 @@ export function ProductCard({ product }: { product: Product }) {
           />
         </a>
 
-        <div className="absolute right-3 top-3 flex flex-col gap-2 opacity-100 md:translate-x-12 md:opacity-0 md:transition-all md:duration-300 md:group-hover:translate-x-0 md:group-hover:opacity-100">
+        <div className="absolute right-3 top-3 z-20 flex flex-col gap-2 opacity-100 md:translate-x-12 md:opacity-0 md:transition-all md:duration-300 md:group-hover:translate-x-0 md:group-hover:opacity-100">
           <a
             href={productUrl}
             className="grid h-10 w-10 place-items-center bg-card text-foreground shadow-sm hover:text-primary"
+            aria-label={`View ${product.name}`}
           >
             <Search className="h-4 w-4" />
           </a>
@@ -47,8 +63,8 @@ export function ProductCard({ product }: { product: Product }) {
 
         <button
           type="button"
-          onClick={() => add(product.id)}
-          className="absolute inset-x-0 bottom-0 translate-y-0 bg-primary py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground transition-transform duration-300 md:translate-y-full md:group-hover:translate-y-0"
+          onClick={handleAddToCart}
+          className="absolute inset-x-0 bottom-0 z-20 translate-y-0 bg-primary py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground transition-transform duration-300 hover:bg-leaf-deep md:translate-y-full md:group-hover:translate-y-0"
         >
           Add to cart
         </button>
@@ -60,16 +76,13 @@ export function ProductCard({ product }: { product: Product }) {
         </a>
 
         <div className="mt-1 flex items-center justify-center gap-2 text-sm">
-          {/* Synchronized with 'oldPrice' field from your backend response payload */}
-          {product.oldPrice && (
+          {oldPrice !== null && oldPrice > price && (
             <span className="text-muted-foreground line-through">
-              Ksh. {parseFloat(product.oldPrice as unknown as string).toLocaleString()}.00
+              Ksh. {formatPrice(oldPrice)}
             </span>
           )}
 
-          <span className="font-semibold">
-            Ksh. {parseFloat(product.price as unknown as string).toLocaleString()}.00
-          </span>
+          <span className="font-semibold">Ksh. {formatPrice(price)}</span>
         </div>
       </div>
     </div>

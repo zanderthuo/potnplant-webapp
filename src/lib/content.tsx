@@ -58,7 +58,7 @@ export type SiteContent = {
 
 export const DEFAULTS: SiteContent = {
   hero: {
-    eyebrow: "Welcome to PotnPlant",
+    eyebrow: "Welcome to",
     title: "POTnPLANT",
     body: "PotnPlant is your everything garden centre for plants in Kenya. We enhance life and beauty of your indoor and outdoor spaces through selected plants. At PotnPlant KENYA our services and products are tailored to suit your everyday gardening needs.",
     ctaLabel: "Shop Plants",

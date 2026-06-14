@@ -14,7 +14,7 @@ import logo from "../../../assets/logo.jpeg";
 const nav = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/products", label: "Products", icon: Package },
-  { to: "/admin/content", label: "Site content", icon: FileText },
+  { to: "/admin/content", label: "Site Content", icon: FileText },
 ];
 
 export default function AdminLayout() {
@@ -22,11 +22,11 @@ export default function AdminLayout() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-[#f3f8f1]">
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed left-4 top-4 z-40 grid h-10 w-10 place-items-center rounded-md border border-border bg-card shadow md:hidden"
+        className="fixed left-4 top-4 z-40 grid h-10 w-10 place-items-center rounded-lg border border-white/10 bg-[#062d19] text-white shadow-lg md:hidden"
       >
         <Menu className="h-5 w-5" />
       </button>
@@ -35,75 +35,84 @@ export default function AdminLayout() {
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
         />
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r border-border bg-sidebar transition-transform duration-300 md:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col overflow-hidden border-r border-white/10 bg-[#062d19] text-white shadow-2xl transition-transform duration-300 md:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
-        } md:flex`}
+        }`}
       >
-        <div className="flex h-[73px] items-center justify-between gap-2 border-b border-border px-6">
-          <div className="flex items-center gap-2">
+        <div className="absolute -left-20 top-20 h-64 w-64 rounded-full bg-[#2f7d32]/20 blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-[#f4b400]/10 blur-3xl" />
+
+        <div className="relative flex h-[74px] items-center justify-between border-b border-white/10 px-6">
+          <div className="flex items-center gap-3">
             <img
               src={logo}
               alt="PotnPlant"
-              className="h-8 w-8 rounded-full object-cover"
+              className="h-10 w-10 rounded-full border border-white/20 object-cover"
             />
 
-            <span className="font-display text-lg tracking-[0.2em]">
-              ADMIN
-            </span>
+            <div>
+              <p className="font-display text-lg tracking-[0.2em] text-white">
+                ADMIN
+              </p>
+
+              <p className="text-xs text-white/50">
+                PotnPlant Dashboard
+              </p>
+            </div>
           </div>
 
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="grid h-8 w-8 place-items-center rounded-md hover:bg-sidebar-accent md:hidden"
+            className="grid h-8 w-8 place-items-center rounded-md text-white/70 hover:bg-white/10 hover:text-white md:hidden"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto p-4">
-          {nav.map((n) => {
-            const active = n.exact
-              ? pathname === n.to
-              : pathname.startsWith(n.to);
+        <nav className="relative flex-1 space-y-2 overflow-y-auto p-4">
+          {nav.map((item) => {
+            const active = item.exact
+              ? pathname === item.to
+              : pathname.startsWith(item.to);
 
             return (
               <Link
-                key={n.to}
-                to={n.to}
+                key={item.to}
+                to={item.to}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition ${
+                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-200 ${
                   active
-                    ? "bg-primary/10 font-semibold text-primary"
-                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent"
+                    ? "bg-[#2f7d32]/25 text-white shadow-lg backdrop-blur border border-[#2f7d32]/30"
+                    : "text-white/70 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                <n.icon className="h-4 w-4" />
-                {n.label}
+                <item.icon
+                  className={`h-5 w-5 ${
+                    active ? "text-[#f4b400]" : ""
+                  }`}
+                />
+
+                <span>{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="border-t border-border p-4">
+        <div className="relative border-t border-white/10 p-4">
           <Link
             to="/"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-sidebar-accent"
+            className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/70 transition hover:bg-white/10 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to store
+            Back to Store
           </Link>
-
-          <button className="mt-1 flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-sidebar-accent">
-            <Settings className="h-4 w-4" />
-            Settings
-          </button>
         </div>
       </aside>
 

@@ -10,7 +10,6 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useCart } from "../../lib/cart";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { logout } from "../../features/auth/store/authSlice";
 import logo from "../../assets/logo.jpeg";
@@ -18,14 +17,12 @@ import logo from "../../assets/logo.jpeg";
 const nav = [
   { to: "/#home", label: "Home" },
   { to: "/#services", label: "Services" },
-  { to: "/#categories", label: "Categories" },
-  { to: "/#products", label: "Plants" },
+  { to: "/#products", label: "Products" },
   { to: "/#contact", label: "Contact Us" },
   { to: "/shop", label: "Shop" },
 ];
 
 export function SiteHeader() {
-  const { count } = useCart();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -33,6 +30,12 @@ export function SiteHeader() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+  const cartItems = useAppSelector((state) => state.cart.items);
+
+  const count = Object.values(cartItems).reduce(
+    (total, qty) => total + qty,
+    0
+  );
 
   const isAdmin =
     isAuthenticated &&
@@ -67,12 +70,14 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 md:px-6">
-        <a href="/#home" className="flex items-center gap-3">
-          <img
-            src={logo}
-            alt="PotnPlant"
-            className="h-12 w-12 rounded-full object-cover"
-          />
+        <a href="/#home" className="flex items-center">
+          <div className="h-20 w-20 overflow-hidden rounded-full">
+            <img
+              src={logo}
+              alt="PotnPlant"
+              className="h-full w-full object-cover"
+            />
+          </div>
         </a>
 
         <nav className="hidden flex-1 items-center justify-center gap-8 text-sm lg:flex">

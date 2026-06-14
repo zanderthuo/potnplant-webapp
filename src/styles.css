@@ -90,6 +90,12 @@
   --sidebar-accent-foreground: var(--bark);
   --sidebar-border: oklch(0.9 0.015 85);
   --sidebar-ring: var(--leaf);
+
+  --hero-green-light: #dff5e3;
+  --hero-green: #4caf50;
+  --hero-green-dark: #0f5d2f;
+  --hero-yellow: #f4b400;
+  --hero-orange: #c86b3c;
 }
 
 .dark {
