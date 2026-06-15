@@ -58,7 +58,7 @@ export type SiteContent = {
 
 export const DEFAULTS: SiteContent = {
   hero: {
-    eyebrow: "Welcome to PotnPlant",
+    eyebrow: "Welcome to",
     title: "POTnPLANT",
     body: "PotnPlant is your everything garden centre for plants in Kenya. We enhance life and beauty of your indoor and outdoor spaces through selected plants. At PotnPlant KENYA our services and products are tailored to suit your everyday gardening needs.",
     ctaLabel: "Shop Plants",
@@ -69,34 +69,7 @@ export const DEFAULTS: SiteContent = {
     eyebrow: "What We Offer",
     title: "Our Services",
     items: [
-      {
-        title: "Rent a Potted Plant",
-        icon: "🪴",
-        points: [
-          "We provide beautiful, well-nurtured plants to create a refreshing and lively environment.",
-          "We cater for homes, events, and office spaces.",
-          "We source and stock a wide selection of healthy indoor and outdoor plants.",
-          "We install, maintain, and replace plants according to specific needs.",
-        ],
-      },
-      {
-        title: "Plant Care",
-        icon: "🌿",
-        points: [
-          "Our gardeners understand the essence of a healthy plant.",
-          "Soil, water, light, and environment affect plant growth.",
-          "We ensure your plants are cared for according to their unique needs.",
-        ],
-      },
-      {
-        title: "Hire a Gardener",
-        icon: "👨‍🌾",
-        points: [
-          "Our experienced gardeners provide customized care to your garden.",
-          "We ensure your plants remain healthy and vibrant.",
-          "We help improve your living spaces.",
-        ],
-      },
+      
     ],
   },
 

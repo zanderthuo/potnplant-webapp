@@ -1,27 +1,85 @@
-import { type InputHTMLAttributes, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type InputHTMLAttributes,
+  type ReactNode,
+} from "react";
 import { MessageCircle } from "lucide-react";
-import { useCart } from "../../../lib/cart";
-import { StoreLayout } from "../../../components/layout/StoreLayout";
 
-const WHATSAPP_NUMBER = "254719808225";
+import { StoreLayout } from "../../../components/layout/StoreLayout";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { fetchProducts } from "../store/productsSlice";
+import { getImageUrl } from "../../../lib/image";
+
+const WHATSAPP_NUMBER = "254143513999";
 
 export default function CheckoutPage() {
-  const { detailed, subtotal } = useCart();
+  const dispatch = useAppDispatch();
+
+  const cartItems = useAppSelector((state) => state.cart.items);
+  const { items: products, loading } = useAppSelector(
+    (state) => state.products
+  );
+
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [location, setLocation] = useState("");
+  const [notes, setNotes] = useState("");
+
+  useEffect(() => {
+    if (!products.length) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, products.length]);
+
+  const detailed = useMemo(() => {
+    return Object.entries(cartItems)
+      .map(([productId, qty]) => {
+        const product = products.find((item) => item.id === productId);
+
+        if (!product) return null;
+
+        return {
+          product,
+          qty,
+        };
+      })
+      .filter(Boolean) as {
+      product: (typeof products)[number];
+      qty: number;
+    }[];
+  }, [cartItems, products]);
+
+  const subtotal = detailed.reduce(
+    (total, item) => total + Number(item.product.price) * item.qty,
+    0
+  );
 
   const shipping = 0;
   const tax = 0;
   const total = subtotal + shipping + tax;
 
+  const canCheckout =
+    name.trim().length > 0 &&
+    phone.trim().length > 0 &&
+    location.trim().length > 0;
+
   const createWhatsAppMessage = () => {
     const productLines = detailed
       .map(({ product, qty }) => {
         return `- ${product.name} x${qty} = Ksh. ${(
-          product.price * qty
+          Number(product.price) * qty
         ).toFixed(2)}`;
       })
       .join("\n");
 
     return `Hello, I would like to place an order.
+
+Customer Details:
+Name: ${name}
+Phone: ${phone}
+Delivery Location: ${location}
 
 Products:
 ${productLines}
@@ -31,12 +89,25 @@ Shipping: Ksh. ${shipping.toFixed(2)}
 Tax: Ksh. ${tax.toFixed(2)}
 Total: Ksh. ${total.toFixed(2)}
 
+Additional Notes:
+${notes || "None"}
+
 Please confirm availability and delivery details.`;
   };
 
   const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(
     createWhatsAppMessage()
   )}`;
+
+  if (loading) {
+    return (
+      <StoreLayout>
+        <div className="mx-auto max-w-3xl px-6 py-24 text-center">
+          <h1 className="font-display text-5xl">Loading checkout...</h1>
+        </div>
+      </StoreLayout>
+    );
+  }
 
   if (!detailed.length) {
     return (
@@ -67,9 +138,30 @@ Please confirm availability and delivery details.`;
         <div className="mt-10 grid gap-12 lg:grid-cols-[1fr_400px]">
           <div className="space-y-10">
             <Section title="Contact Information">
-              <Field label="Full name" name="name" required />
-              <Field label="Phone number" name="phone" type="tel" required />
-              <Field label="Delivery location" name="location" required />
+              <Field
+                label="Full name"
+                name="name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                required
+              />
+
+              <Field
+                label="Phone number"
+                name="phone"
+                type="tel"
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+                required
+              />
+
+              <Field
+                label="Delivery location"
+                name="location"
+                value={location}
+                onChange={(event) => setLocation(event.target.value)}
+                required
+              />
             </Section>
 
             <Section title="Order Instructions">
@@ -80,6 +172,8 @@ Please confirm availability and delivery details.`;
 
                 <textarea
                   name="notes"
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
                   rows={5}
                   placeholder="Example: Deliver to Westlands, call before delivery..."
                   className="w-full border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
@@ -96,7 +190,7 @@ Please confirm availability and delivery details.`;
                 <li key={product.id} className="flex items-center gap-4">
                   <div className="relative">
                     <img
-                      src={product.image}
+                      src={getImageUrl(product.image)}
                       alt={product.name}
                       className="h-16 w-16 object-cover"
                     />
@@ -109,12 +203,12 @@ Please confirm availability and delivery details.`;
                   <div className="flex-1">
                     <p className="font-display text-base">{product.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      Ksh. {product.price.toFixed(2)}
+                      Ksh. {Number(product.price).toFixed(2)}
                     </p>
                   </div>
 
                   <p className="text-sm font-semibold">
-                    Ksh. {(product.price * qty).toFixed(2)}
+                    Ksh. {(Number(product.price) * qty).toFixed(2)}
                   </p>
                 </li>
               ))}
@@ -133,15 +227,26 @@ Please confirm availability and delivery details.`;
               </div>
             </dl>
 
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex w-full items-center justify-center gap-3 bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-leaf-deep"
-            >
-              <MessageCircle className="h-4 w-4" />
-              Place order using WhatsApp
-            </a>
+            {canCheckout ? (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex w-full items-center justify-center gap-3 bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-leaf-deep"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Place order using WhatsApp
+              </a>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="mt-6 inline-flex w-full cursor-not-allowed items-center justify-center gap-3 bg-muted px-8 py-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Fill details to continue
+              </button>
+            )}
 
             <a
               href="/cart"
