@@ -12,8 +12,8 @@ import {
 import logo from "../../../assets/logo.jpeg";
 
 const nav = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/admin/products", label: "Products", icon: Package },
+  // { to: "/admin", label: "Dashboard", icon: LayoutDashboard,  },
+  { to: "/admin/products", label: "Products", icon: Package, exact: true },
   { to: "/admin/content", label: "Site Content", icon: FileText },
 ];
 

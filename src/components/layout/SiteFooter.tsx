@@ -1,4 +1,8 @@
 import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { FaXTwitter } from "react-icons/fa6";
+import { FaFacebookF } from "react-icons/fa";
+import { FaInstagram } from "react-icons/fa";
+
 import logo from "../../assets/logo.jpeg";
 
 const navigation = [
@@ -20,7 +24,7 @@ export function SiteFooter() {
       <div className="relative mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-3">
         <div className="md:max-w-sm">
           <div className="flex items-center gap-3">
-            <div className="h-20 w-20 overflow-hidden rounded-full">
+            <div className="h-15 w-20 overflow-hidden">
                         <img
                           src={logo}
                           alt="PotnPlant"
@@ -51,20 +55,17 @@ export function SiteFooter() {
 
           <div className="mt-6 flex items-center gap-4 text-white/60">
             <a href="#" aria-label="Instagram" className="hover:text-[#f4b400]">
-              <Instagram className="h-4 w-4" />
+              <FaInstagram className="h-4 w-4" />
             </a>
 
             <a href="#" aria-label="Facebook" className="hover:text-[#f4b400]">
-              <Facebook className="h-4 w-4" />
+              <FaFacebookF className="h-4 w-4" />
             </a>
 
-            <a href="#" aria-label="Twitter" className="hover:text-[#f4b400]">
-              <Twitter className="h-4 w-4" />
+            <a href="https://x.com/potnplantke" aria-label="Twitter" className="hover:text-[#f4b400]">
+              <FaXTwitter className="h-4 w-4" />
             </a>
 
-            <a href="#" aria-label="Youtube" className="hover:text-[#f4b400]">
-              <Youtube className="h-4 w-4" />
-            </a>
           </div>
         </div>
 

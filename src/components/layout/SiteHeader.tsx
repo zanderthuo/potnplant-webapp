@@ -71,7 +71,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 md:px-6">
         <a href="/#home" className="flex items-center">
-          <div className="h-20 w-20 overflow-hidden rounded-full">
+          <div className="h-15 w-20 overflow-hidden">
             <img
               src={logo}
               alt="PotnPlant"

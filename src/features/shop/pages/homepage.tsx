@@ -75,9 +75,24 @@ function HeroSection({ hero }: { hero: SiteContent["hero"] }) {
             {hero.title}
           </h1>
 
-          <p className="mt-6 max-w-md text-base leading-7 text-white/80">
-            {hero.body}
-          </p>
+          <p
+            className="mt-6 max-w-md text-base leading-7 text-white/80"
+            dangerouslySetInnerHTML={{
+              __html: hero.body
+                .replace(
+                  /PotnPlant KENYA/g,
+                  '<strong style="color:#f4b400">PotnPlant KENYA</strong>'
+                )
+                .replace(
+                  /plants in Kenya/g,
+                  '<strong style="color:#f4b400">plants in Kenya</strong>'
+                )
+                .replace(
+                  /PotnPlant/g,
+                  '<strong style="color:#f4b400">PotnPlant</strong>'
+                ),
+            }}
+          />
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <a
@@ -142,18 +157,19 @@ function OurServices() {
       title: "Plant Care",
       icon: "🌿",
       points: [
-        "Our gardeners understand the essence of a healthy plant.",
-        "Soil, water, light, and environment affect plant growth.",
-        "We ensure your plants are cared for according to their unique needs.",
+        <>
+        Our gardeners understand the essence of a healthy plant.
+        <strong> Soil, water, light, and environment </strong>
+        affect plant growth. We ensure your plants are cared for
+        according to their unique needs.
+      </>,
       ],
     },
     {
       title: "Hire a Gardener",
       icon: "👨‍🌾",
       points: [
-        "Our experienced gardeners provide customized care to your garden.",
-        "We ensure your plants remain healthy and vibrant.",
-        "We help improve your living spaces.",
+        "Our experienced gardeners provide customized care to your garden ensuring your plants remain healthy and improve your living spaces",
       ],
     },
   ];
@@ -184,8 +200,8 @@ function OurServices() {
               </h3>
 
               <ul className="space-y-3 text-sm leading-6 text-muted-foreground">
-                {service.points.map((point) => (
-                  <li key={point} className="flex gap-3">
+                {service.points.map((point, index) => (
+                  <li key={index} className="flex gap-3">
                     <span className="mt-0.5 font-bold text-primary">✓</span>
                     <span>{point}</span>
                   </li>
@@ -426,7 +442,7 @@ function ContactSection() {
             <ContactItem
               icon={<MapPin className="h-5 w-5" />}
               title="Location"
-              value="Nairobi, Kenya"
+              value="Rabai Road, Nairobi, Kenya"
             />
           </div>
         </div>
