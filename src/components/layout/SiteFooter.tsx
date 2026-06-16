@@ -3,7 +3,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import { FaFacebookF } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa";
 
-import logo from "../../assets/logo.jpeg";
+import logo from "../../assets/logo-light.png";
 
 const navigation = [
   { to: "/#home", label: "Home" },
@@ -25,12 +25,12 @@ export function SiteFooter() {
         <div className="md:max-w-sm">
           <div className="flex items-center gap-3">
             <div className="h-15 w-20 overflow-hidden">
-                        <img
-                          src={logo}
-                          alt="PotnPlant"
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
+              <img
+                src={logo}
+                alt="PotnPlant"
+                className="h-full w-full object-cover"
+              />
+            </div>
 
             <span className="font-display text-2xl tracking-[0.24em] text-white">
               POTnPLANT
@@ -38,13 +38,14 @@ export function SiteFooter() {
           </div>
 
           <p className="mt-6 max-w-sm text-sm leading-relaxed text-white/70">
-            Empowering all people to be plant people — a small studio providing
-            greenery, potted plants, plant care, and gardening services for
-            homes, offices, and events.
+            PotnPlant is your everything garden centre for plants in Kenya. We
+            enhance life and beauty of your indoor and outdoor spaces through
+            selected plants. At PotnPlant KENYA our services and products are
+            tailored to suit your everyday gardening needs.
           </p>
 
           <p className="mt-6 text-sm text-white/80">
-            <span className="text-[#f4b400]">hotline: </span>
+            <span className="text-[#f4b400]">Call/WhatsApp: </span>
             <a
               href="tel:+254143513999"
               className="font-medium text-white hover:text-[#f4b400]"
@@ -54,18 +55,35 @@ export function SiteFooter() {
           </p>
 
           <div className="mt-6 flex items-center gap-4 text-white/60">
-            <a href="#" aria-label="Instagram" className="hover:text-[#f4b400]">
+            <a
+              href="https://www.instagram.com/potnplantke?igsh=Z2VlOWVhOGZmeGFj"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="hover:text-[#f4b400]"
+            >
               <FaInstagram className="h-4 w-4" />
             </a>
 
-            <a href="#" aria-label="Facebook" className="hover:text-[#f4b400]">
+            <a
+              href="https://facebook.com/potnplantke"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              className="hover:text-[#f4b400]"
+            >
               <FaFacebookF className="h-4 w-4" />
             </a>
 
-            <a href="https://x.com/potnplantke" aria-label="Twitter" className="hover:text-[#f4b400]">
+            <a
+              href="https://x.com/potnplantke"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X"
+              className="hover:text-[#f4b400]"
+            >
               <FaXTwitter className="h-4 w-4" />
             </a>
-
           </div>
         </div>
 
@@ -109,15 +127,7 @@ export function SiteFooter() {
       </div>
 
       <div className="relative border-t border-white/10 bg-black/20 py-5 text-center text-xs text-white/70">
-        © {currentYear} PotnPlant | Made with ❤️ by{" "}
-        <a
-          href="https://craftzander-website.vercel.app/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-medium text-[#f4b400] hover:text-white"
-        >
-          craftzander
-        </a>
+        © {currentYear} PotnPlant
       </div>
     </footer>
   );
