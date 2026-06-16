@@ -22,6 +22,7 @@ import HomePage from "./features/shop/pages/homepage";
 import LoginPage from "./features/auth/pages/LoginPage";
 import ForgotPasswordPage from "./features/auth/pages/ForgotPasswordPage";
 import ResetPasswordPage from "./features/auth/pages/ResetPasswordPage";
+import EditProductPage from "./features/admin/pages/EditProductPage";
 
 export default function App() {
   return (
@@ -60,6 +61,7 @@ export default function App() {
             <Route index element={<DashboardAdmin />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="products/create" element={<CreateProductPage />} />
+            <Route path="products/:id/edit" element={<EditProductPage />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="customers" element={<AdminCustomers />} />
             <Route path="content" element={<AdminContent />} />

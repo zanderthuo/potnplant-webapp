@@ -1,16 +1,21 @@
 import {
   useEffect,
+  useMemo,
   useState,
   type ChangeEvent,
   type FormEvent,
 } from "react";
 import { ArrowLeft, Save, Upload } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { createProductThunk } from "../store/adminProductSlice";
+import { updateProductThunk } from "../store/adminProductSlice";
 import { fetchAdminCategoriesThunk } from "../store/adminCategorySlice";
+import {
+  clearSelectedProduct,
+  fetchProduct,
+} from "../../shop/store/productsSlice";
 
 type ProductForm = {
   name: string;
@@ -34,11 +39,20 @@ const initialForm: ProductForm = {
   image: null,
 };
 
-export default function CreateProductPage() {
+const API_URL = "http://localhost:3000";
+
+export default function EditProductPage() {
+  const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { creating, createError } = useAppSelector(
+  const {
+    item: selectedProduct,
+    loading,
+    error: fetchError,
+  } = useAppSelector((state) => state.products);
+
+  const { updating, updateError } = useAppSelector(
     (state) => state.adminProducts
   );
 
@@ -51,15 +65,50 @@ export default function CreateProductPage() {
   const [form, setForm] = useState<ProductForm>(initialForm);
   const [preview, setPreview] = useState("");
 
-  useEffect(() => {
-    dispatch(fetchAdminCategoriesThunk());
-  }, [dispatch]);
+  const selectedProductCategoryId = useMemo(() => {
+    if (!selectedProduct) return "";
+
+    if (typeof selectedProduct.category === "string") {
+      return (
+        categories.find(
+          (category) =>
+            category.name.toLowerCase() ===
+            selectedProduct.category.toLowerCase()
+        )?.id || ""
+      );
+    }
+
+    return "";
+  }, [selectedProduct, categories]);
 
   useEffect(() => {
+    dispatch(fetchAdminCategoriesThunk());
+
+    if (id) {
+      dispatch(fetchProduct(id));
+    }
+
     return () => {
-      if (preview) URL.revokeObjectURL(preview);
+      dispatch(clearSelectedProduct());
     };
-  }, [preview]);
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (!selectedProduct) return;
+
+    setForm({
+      name: selectedProduct.name || "",
+      description: selectedProduct.description || "",
+      price: String(selectedProduct.price ?? ""),
+      oldPrice: String(selectedProduct.oldPrice ?? ""),
+      stock: String(selectedProduct.stock ?? ""),
+      tag: selectedProduct.tag || "",
+      categoryId: selectedProductCategoryId,
+      image: null,
+    });
+
+    setPreview(selectedProduct.image || "");
+  }, [selectedProduct, selectedProductCategoryId]);
 
   const updateField = <K extends keyof ProductForm>(
     field: K,
@@ -71,11 +120,14 @@ export default function CreateProductPage() {
     }));
   };
 
-  const handleNameChange = (value: string) => {
-    setForm((current) => ({
-      ...current,
-      name: value,
-    }));
+  const getImageUrl = (image?: string) => {
+    if (!image) return "";
+
+    if (image.startsWith("http") || image.startsWith("blob:")) {
+      return image;
+    }
+
+    return `${API_URL}${image}`;
   };
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -84,22 +136,19 @@ export default function CreateProductPage() {
     if (!file) return;
 
     updateField("image", file);
-
-    if (preview) URL.revokeObjectURL(preview);
-
     setPreview(URL.createObjectURL(file));
   };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!form.categoryId) {
-      toast.error("Please select a category.");
+    if (!id) {
+      toast.error("Product ID is missing.");
       return;
     }
 
-    if (!form.image) {
-      toast.error("Please upload a product image.");
+    if (!form.categoryId) {
+      toast.error("Please select a category.");
       return;
     }
 
@@ -110,7 +159,6 @@ export default function CreateProductPage() {
     payload.append("price", form.price);
     payload.append("stock", form.stock);
     payload.append("categoryId", form.categoryId);
-    payload.append("image", form.image);
 
     if (form.oldPrice) {
       payload.append("oldPrice", form.oldPrice);
@@ -120,31 +168,48 @@ export default function CreateProductPage() {
       payload.append("tag", form.tag);
     }
 
-    try {
-      const result = await dispatch(createProductThunk(payload)).unwrap();
+    if (form.image) {
+      payload.append("image", form.image);
+    }
 
-      toast.success(result?.message || "Product created successfully.");
+    try {
+      const result = await dispatch(
+        updateProductThunk({
+          id,
+          payload,
+        })
+      ).unwrap();
+
+      toast.success(result?.message || "Product updated successfully.");
 
       setTimeout(() => {
         navigate("/admin/products");
-      }, 1200);
+      }, 1000);
     } catch (error: any) {
-      const message =
-        error?.message ||
-        error?.response?.data?.message ||
-        createError ||
-        "Failed to create product";
-
-      toast.error(message);
+      toast.error(error || updateError || "Failed to update product");
     }
   };
+
+  if (loading) {
+    return <div className="p-8">Loading product...</div>;
+  }
+
+  if (fetchError) {
+    return (
+      <div className="p-8">
+        <div className="rounded border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+          {fetchError}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="eyebrow">Catalog</p>
-          <h1 className="mt-1 font-display text-4xl">Create Product</h1>
+          <h1 className="mt-1 font-display text-4xl">Edit Product</h1>
         </div>
 
         <button
@@ -161,9 +226,9 @@ export default function CreateProductPage() {
         onSubmit={onSubmit}
         className="mt-8 max-w-4xl rounded-lg border border-border bg-card p-6"
       >
-        {createError && (
+        {updateError && (
           <div className="mb-5 rounded border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {createError}
+            {updateError}
           </div>
         )}
 
@@ -177,7 +242,7 @@ export default function CreateProductPage() {
           <Field
             label="Product name"
             value={form.name}
-            onChange={handleNameChange}
+            onChange={(value) => updateField("name", value)}
             required
           />
 
@@ -224,7 +289,7 @@ export default function CreateProductPage() {
           </label>
 
           <label className="block md:col-span-2">
-            <span className="mb-2 block text-xs uppercase tracking-widest text-muted-foreground">
+            <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
               Category
             </span>
 
@@ -255,21 +320,24 @@ export default function CreateProductPage() {
             <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border bg-background p-4">
               {preview && (
                 <img
-                  src={preview}
+                  src={getImageUrl(preview)}
                   alt="Product preview"
                   className="h-40 w-40 rounded object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src =
+                      "https://placehold.co/160x160?text=No+Image";
+                  }}
                 />
               )}
 
               <label className="inline-flex w-fit cursor-pointer items-center gap-2 bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-leaf-deep">
                 <Upload className="h-4 w-4" />
-                Upload image
+                Change image
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
                   className="hidden"
-                  required
                 />
               </label>
             </div>
@@ -295,11 +363,11 @@ export default function CreateProductPage() {
         <div className="mt-8 flex justify-end">
           <button
             type="submit"
-            disabled={creating || loadingCategories}
+            disabled={updating || loadingCategories}
             className="inline-flex items-center gap-2 bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-leaf-deep disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Save className="h-4 w-4" />
-            {creating ? "Saving..." : "Save Product"}
+            {updating ? "Updating..." : "Update Product"}
           </button>
         </div>
       </form>
