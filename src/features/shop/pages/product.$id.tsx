@@ -1,38 +1,64 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronRight, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useParams } from "react-router-dom";
-import { useCart } from "../../../lib/cart";
+import toast from "react-hot-toast";
+
 import { ProductCard } from "../../../components/ProductCard";
 import { StoreLayout } from "../../../components/layout/StoreLayout";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { fetchProduct, fetchProducts } from "../store/productsSlice";
+import { addToCart } from "../store/cartSlice";
 import { getImageUrl } from "../../../lib/image";
 
 export default function ProductPage() {
   const dispatch = useAppDispatch();
-
-  // Hook up your framework's native parameter hook to reliably extract the ID
-  // This matches the $id variable name from your filename: product.$id.tsx
   const { id: productId } = useParams<{ id: string }>();
 
-  const { item: product, items, loading, error } = useAppSelector((state) => state.products);
-  const { add } = useCart();
+  const {
+    item: product,
+    items,
+    loading,
+    error,
+  } = useAppSelector((state) => state.products);
+
   const [qty, setQty] = useState(1);
 
   useEffect(() => {
     if (productId) {
       dispatch(fetchProduct(productId));
     }
+
     if (items.length === 0) {
       dispatch(fetchProducts());
     }
   }, [dispatch, productId, items.length]);
 
+  useEffect(() => {
+    setQty(1);
+  }, [productId]);
+
   const related = useMemo(() => {
-    // Check if product is fully loaded and has an ID
-    if (!product || !("id" in product)) return [];
-    return items.filter((p) => p.id !== product.id).slice(0, 4);
+    if (!product?.id) return [];
+
+    return items.filter((item) => item.id !== product.id).slice(0, 4);
   }, [items, product]);
+
+  const formatPrice = (value: string | number) => {
+    return Number(value).toLocaleString("en-KE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
+  const handleAddToCart = () => {
+    if (!product?.id) return;
+
+    for (let i = 0; i < qty; i += 1) {
+      dispatch(addToCart(product.id));
+    }
+
+    toast.success(`${qty} ${qty === 1 ? "item" : "items"} added to cart.`);
+  };
 
   if (loading) {
     return (
@@ -44,15 +70,16 @@ export default function ProductPage() {
     );
   }
 
-  // Robust check ensuring product is not null, not an empty object, and has properties
-  if (error || !product || Object.keys(product).length === 0 || !("id" in product)) {
+  if (error || !product?.id) {
     return (
       <StoreLayout>
         <div className="mx-auto max-w-3xl p-20 text-center">
           <h1 className="font-display text-4xl">
             {error ? "An error occurred" : "Plant not found"}
           </h1>
-          <p className="mt-2 text-muted-foreground">{error}</p>
+
+          {error && <p className="mt-2 text-muted-foreground">{error}</p>}
+
           <a href="/shop" className="mt-6 inline-block text-primary underline">
             Back to shop
           </a>
@@ -61,6 +88,8 @@ export default function ProductPage() {
     );
   }
 
+  const price = Number(product.price);
+  const oldPrice = product.oldPrice ? Number(product.oldPrice) : null;
 
   return (
     <StoreLayout>
@@ -69,23 +98,31 @@ export default function ProductPage() {
           <a href="/" className="hover:text-foreground">
             Home
           </a>
+
           <ChevronRight className="h-3 w-3" />
+
           <a href="/shop" className="hover:text-foreground">
             Shop
           </a>
+
           <ChevronRight className="h-3 w-3" />
+
           <span className="text-foreground">{product.name}</span>
         </div>
       </div>
 
       <div className="mx-auto grid max-w-7xl gap-16 px-6 py-16 md:grid-cols-2">
-        <div className="bg-muted">
+        <div className="overflow-hidden bg-muted">
           <img
             src={getImageUrl(product.image)}
             alt={product.name}
             width={1000}
             height={1000}
             className="h-full w-full object-cover"
+            onError={(event) => {
+              event.currentTarget.src =
+                "https://placehold.co/1000x1000?text=No+Image";
+            }}
           />
         </div>
 
@@ -95,14 +132,14 @@ export default function ProductPage() {
           <h1 className="mt-3 font-display text-5xl">{product.name}</h1>
 
           <div className="mt-6 flex items-baseline gap-3">
-            {product.oldPrice && (
+            {oldPrice !== null && oldPrice > price && (
               <span className="text-xl text-muted-foreground line-through">
-                Ksh. {parseFloat(product.oldPrice as unknown as string).toLocaleString()}.00
+                Ksh. {formatPrice(oldPrice)}
               </span>
             )}
 
             <span className="font-display text-4xl text-primary">
-              Ksh. {parseFloat(product.price as unknown as string).toLocaleString()}.00
+              Ksh. {formatPrice(price)}
             </span>
           </div>
 
@@ -110,12 +147,13 @@ export default function ProductPage() {
             {product.description}
           </p>
 
-          <div className="mt-10 flex items-center gap-4">
+          <div className="mt-10 flex flex-wrap items-center gap-4">
             <div className="flex items-center border border-border">
               <button
                 type="button"
-                onClick={() => setQty(Math.max(1, qty - 1))}
+                onClick={() => setQty((current) => Math.max(1, current - 1))}
                 className="grid h-12 w-12 place-items-center hover:bg-muted"
+                aria-label="Decrease quantity"
               >
                 <Minus className="h-3 w-3" />
               </button>
@@ -124,8 +162,9 @@ export default function ProductPage() {
 
               <button
                 type="button"
-                onClick={() => setQty(qty + 1)}
+                onClick={() => setQty((current) => current + 1)}
                 className="grid h-12 w-12 place-items-center hover:bg-muted"
+                aria-label="Increase quantity"
               >
                 <Plus className="h-3 w-3" />
               </button>
@@ -133,13 +172,12 @@ export default function ProductPage() {
 
             <button
               type="button"
-              onClick={() => add(product.id, qty)}
+              onClick={handleAddToCart}
               className="inline-flex items-center gap-2 bg-primary px-8 py-4 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-leaf-deep"
             >
               <ShoppingCart className="h-4 w-4" />
               Add to cart
             </button>
-
           </div>
 
           <dl className="mt-12 space-y-2 border-t border-border pt-6 text-sm">
@@ -147,7 +185,6 @@ export default function ProductPage() {
               <dt className="w-32 text-muted-foreground">Category</dt>
               <dd>{product.category}</dd>
             </div>
-
           </dl>
         </div>
       </div>
@@ -159,8 +196,8 @@ export default function ProductPage() {
           </h2>
 
           <div className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {related.map((item) => (
+              <ProductCard key={item.id} product={item} />
             ))}
           </div>
         </div>
