@@ -17,7 +17,7 @@ export type LoginResponse = {
 
 export async function login(payload: LoginPayload) {
   const response = await api.post<LoginResponse>(
-    "/admin/auth/login",
+    "/api/admin/auth/login",
     payload
   );
 

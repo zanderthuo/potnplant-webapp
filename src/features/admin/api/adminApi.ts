@@ -12,7 +12,7 @@ function getAuthHeaders() {
 }
 
 export async function createProduct(payload: CreateProductPayload) {
-  const response = await api.post("/admin/products", payload, {
+  const response = await api.post("/api/admin/products", payload, {
     headers: {
       ...getAuthHeaders(),
       "Content-Type": "multipart/form-data",
@@ -23,7 +23,7 @@ export async function createProduct(payload: CreateProductPayload) {
 }
 
 export async function updateProduct(id: string, payload: UpdateProductPayload) {
-  const response = await api.patch(`/admin/products/${id}`, payload, {
+  const response = await api.patch(`/api/admin/products/${id}`, payload, {
     headers: {
       ...getAuthHeaders(),
       "Content-Type": "multipart/form-data",
@@ -34,7 +34,7 @@ export async function updateProduct(id: string, payload: UpdateProductPayload) {
 }
 
 export async function deleteProduct(id: string) {
-  const response = await api.delete(`/admin/products/${id}`, {
+  const response = await api.delete(`/api/admin/products/${id}`, {
     headers: getAuthHeaders(),
   });
 
@@ -42,13 +42,13 @@ export async function deleteProduct(id: string) {
 }
 
 export async function getAdminProducts() {
-  const response = await api.get("/public/products");
+  const response = await api.get("/api/public/products");
 
   return response.data;
 }
 
 export async function getAdminCategories() {
-  const response = await api.get("/admin/categories", {
+  const response = await api.get("/api/admin/categories", {
     headers: getAuthHeaders(),
   });
 
