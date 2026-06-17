@@ -33,7 +33,7 @@ function mapApiProduct(product: ApiProductResponse): Product {
 
 export async function getProducts(): Promise<Product[]> {
   const response = await api.get<ApiResponse<ApiProductResponse[]>>(
-    "/public/products"
+    "/api/public/products"
   );
 
   return response.data.data.map(mapApiProduct);
@@ -41,7 +41,7 @@ export async function getProducts(): Promise<Product[]> {
 
 export async function getProductById(id: string): Promise<Product> {
   const response = await api.get<ApiResponse<ApiProductResponse>>(
-    `/public/products/${id}`
+    `/api/public/products/${id}`
   );
 
   return mapApiProduct(response.data.data);
