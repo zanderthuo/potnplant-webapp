@@ -66,7 +66,7 @@ export function SiteFooter() {
             </a>
 
             <a
-              href="https://facebook.com/potnplantke"
+              href="https://www.facebook.com/share/1LE8matnAo/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"

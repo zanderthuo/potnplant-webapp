@@ -47,7 +47,7 @@ export const fetchProduct = createAsyncThunk<
     const products: Product[] = await getProducts();
 
     const product = products.find(
-      (p) => p.id === id || p.slug === id
+      (p) => p.id === id
     );
 
     if (!product) {

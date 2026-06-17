@@ -4,7 +4,6 @@ import type { Product } from "../../../lib/products";
 type ApiCategory = {
   id: string;
   name: string;
-  slug: string;
   description?: string;
   image?: string;
   isActive: boolean;

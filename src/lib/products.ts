@@ -16,7 +16,6 @@ export type ProductCategory =
 
 export type Product = {
   id: string;
-  slug: string;
   name: string;
   category: ProductCategory | string;
   price: number;
@@ -32,7 +31,6 @@ export type Product = {
 export const products: Product[] = [
   {
     id: "1",
-    slug: "echeveria-blue-succulent-white-planter",
     name: "Echeveria Blue Succulent - White Planter Very Small Pot Size",
     category: "Indoor Potted Plants",
     price: 1000,
@@ -43,7 +41,6 @@ export const products: Product[] = [
   },
   {
     id: "2",
-    slug: "copper-leaf-jacobs-coat",
     name: "Copper Leaf/ Jacob's Coat",
     category: "Indoor Potted Plants",
     price: 1000,
@@ -54,7 +51,6 @@ export const products: Product[] = [
   },
   {
     id: "3",
-    slug: "graptopetalum-ghost-plant",
     name: "Graptopetalum Ghost Plant",
     category: "Indoor Potted Plants",
     price: 1000,
@@ -66,7 +62,6 @@ export const products: Product[] = [
   },
   {
     id: "4",
-    slug: "dwarf-snake-plant-green-planter",
     name: "Dwarf Snake Plant - Green Planter Very Small Pot Size",
     category: "Indoor Potted Plants",
     price: 1500,
@@ -78,7 +73,6 @@ export const products: Product[] = [
   },
   {
     id: "5",
-    slug: "echeveria-lilacina-brown-planter",
     name: "Echeveria Lilacina - Brown Planter Very Small Pot Size",
     category: "Indoor Potted Plants",
     price: 1500,
@@ -89,7 +83,6 @@ export const products: Product[] = [
   },
   {
     id: "6",
-    slug: "echeveria-black-prince-brown-planter",
     name: "Echeveria Black Prince - Brown Planter Very Small Pot Size",
     category: "Indoor Potted Plants",
     price: 1500,
@@ -100,7 +93,6 @@ export const products: Product[] = [
   },
   {
     id: "7",
-    slug: "kalanchoe-longiflora-white-planter",
     name: "Kalanchoe Longiflora - White Planter Very Small Pot Size",
     category: "Indoor Potted Plants",
     price: 1500,
@@ -111,7 +103,6 @@ export const products: Product[] = [
   },
   {
     id: "8",
-    slug: "kalanchoe-thyrsiflora-white-planter",
     name: "Kalanchoe Thyrsiflora - White Planter Very Small Pot Size",
     category: "Indoor Potted Plants",
     price: 1500,
@@ -123,7 +114,6 @@ export const products: Product[] = [
   },
   {
   id: "9",
-  slug: "variegated-swedish-ivy",
   name: "Variegated Swedish Ivy / Plectranthus Australis Variegatus",
   category: "Outdoor Potted Plants",
   price: 2000,
@@ -133,7 +123,6 @@ export const products: Product[] = [
 },
 {
   id: "10",
-  slug: "oyster-plant-clay-pot-medium",
   name: "Oyster Plant / Tradescantia Spathacea - Clay Pot, Not Painted Medium Pot Size",
   category: "Outdoor Potted Plants",
   price: 2500,
@@ -143,7 +132,6 @@ export const products: Product[] = [
 },
 {
   id: "11",
-  slug: "oyster-plant-painted-black",
   name: "Oyster Plant / Tradescantia Spathacea - Clay Pot, Painted Black Small Pot Size",
   category: "Outdoor Potted Plants",
   price: 2500,
@@ -153,7 +141,6 @@ export const products: Product[] = [
 },
 {
   id: "12",
-  slug: "agave-attenuata",
   name: "Agave / Agave Attenuata",
   category: "Outdoor Potted Plants",
   price: 2500,
@@ -163,7 +150,6 @@ export const products: Product[] = [
 },
 {
   id: "13",
-  slug: "blue-chalksticks",
   name: "Blue Chalksticks Plant",
   category: "Outdoor Potted Plants",
   price: 2500,
@@ -173,7 +159,6 @@ export const products: Product[] = [
 },
 {
   id: "14",
-  slug: "hibiscus-plant",
   name: "Hibiscus Plant",
   category: "Outdoor Potted Plants",
   price: 2500,
@@ -183,7 +168,6 @@ export const products: Product[] = [
 },
 {
   id: "15",
-  slug: "variegated-english-ivy",
   name: "Variegated English Ivy - Clay Pot, Painted Yellow Small Pot Size",
   category: "Outdoor Potted Plants",
   price: 2500,
@@ -193,7 +177,6 @@ export const products: Product[] = [
 },
 {
   id: "16",
-  slug: "eranthemum-atropurpureum",
   name: "Eranthemum / Pseuderanthemum Atropurpureum",
   category: "Outdoor Potted Plants",
   price: 3000,
@@ -203,8 +186,8 @@ export const products: Product[] = [
 },
 ];
 
-export const findProduct = (slug: string) =>
-  products.find((product) => product.slug === slug);
+export const findProduct = (id: string) =>
+  products.find((product) => product.id === id);
 
 export const categories = [
   {

@@ -7,6 +7,6 @@ export const getImageUrl = (image?: string | null) => {
     return image;
   }
 
-const apiUrl = "http://localhost:3000"; // Replace with your actual backend API URL
+const apiUrl = import.meta.env.VITE_API_BASE_URL; // Replace with your actual backend API URL
   return `${apiUrl}${image}`;
 };

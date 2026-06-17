@@ -1,19 +1,18 @@
 import { useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard,
   Package,
-  Settings,
   ArrowLeft,
   FileText,
   Menu,
   X,
+  LayoutDashboard,
 } from "lucide-react";
 import logo from "../../../assets/logo.jpeg";
 
 const nav = [
-  // { to: "/admin", label: "Dashboard", icon: LayoutDashboard,  },
-  { to: "/admin/products", label: "Products", icon: Package, exact: true },
+  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true  },
+  { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/content", label: "Site Content", icon: FileText },
 ];
 

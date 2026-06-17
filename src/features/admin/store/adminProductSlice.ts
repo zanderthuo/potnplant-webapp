@@ -1,10 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { createProduct, getAdminProducts } from "../api/adminApi";
+import {
+  createProduct,
+  deleteProduct,
+  getAdminProducts,
+  updateProduct,
+} from "../api/adminApi";
 
 export type AdminCategory = {
   id: string;
   name: string;
-  slug: string;
   description: string;
   image: string;
   isActive: boolean;
@@ -15,7 +19,6 @@ export type AdminCategory = {
 export type AdminProduct = {
   id: string;
   name: string;
-  slug: string;
   description: string;
   price: string | number;
   oldPrice: string | number | null;
@@ -37,6 +40,7 @@ type ApiResponse<T> = {
 
 type AdminProductState = {
   products: AdminProduct[];
+  selectedProduct: AdminProduct | null;
 
   loading: boolean;
   fetchError: string | null;
@@ -44,10 +48,17 @@ type AdminProductState = {
   creating: boolean;
   createError: string | null;
   createSuccess: boolean;
+
+  updating: boolean;
+  updateError: string | null;
+
+  deleting: boolean;
+  deleteError: string | null;
 };
 
 const initialState: AdminProductState = {
   products: [],
+  selectedProduct: null,
 
   loading: false,
   fetchError: null,
@@ -55,6 +66,12 @@ const initialState: AdminProductState = {
   creating: false,
   createError: null,
   createSuccess: false,
+
+  updating: false,
+  updateError: null,
+
+  deleting: false,
+  deleteError: null,
 };
 
 export const fetchAdminProductsThunk = createAsyncThunk<
@@ -85,6 +102,38 @@ export const createProductThunk = createAsyncThunk<
   }
 });
 
+export const updateProductThunk = createAsyncThunk<
+  ApiResponse<AdminProduct>,
+  { id: string; payload: FormData },
+  { rejectValue: string }
+>(
+  "adminProducts/updateProduct",
+  async ({ id, payload }, { rejectWithValue }) => {
+    try {
+      return await updateProduct(id, payload);
+    } catch (error: any) {
+      return rejectWithValue(
+        error?.response?.data?.message || "Failed to update product"
+      );
+    }
+  }
+);
+
+export const deleteProductThunk = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>("adminProducts/deleteProduct", async (id, { rejectWithValue }) => {
+  try {
+    await deleteProduct(id);
+    return id;
+  } catch (error: any) {
+    return rejectWithValue(
+      error?.response?.data?.message || "Failed to delete product"
+    );
+  }
+});
+
 const adminProductSlice = createSlice({
   name: "adminProducts",
   initialState,
@@ -94,9 +143,15 @@ const adminProductSlice = createSlice({
       state.createError = null;
       state.createSuccess = false;
     },
+
+    clearSelectedProduct: (state) => {
+      state.selectedProduct = null;
+    },
   },
+
   extraReducers: (builder) => {
     builder
+      // FETCH ALL
       .addCase(fetchAdminProductsThunk.pending, (state) => {
         state.loading = true;
         state.fetchError = null;
@@ -110,6 +165,7 @@ const adminProductSlice = createSlice({
         state.fetchError = action.payload || "Failed to fetch products";
       })
 
+      // CREATE
       .addCase(createProductThunk.pending, (state) => {
         state.creating = true;
         state.createError = null;
@@ -126,10 +182,51 @@ const adminProductSlice = createSlice({
       .addCase(createProductThunk.rejected, (state, action) => {
         state.creating = false;
         state.createError = action.payload || "Failed to create product";
+      })
+
+      // UPDATE
+      .addCase(updateProductThunk.pending, (state) => {
+        state.updating = true;
+        state.updateError = null;
+      })
+      .addCase(updateProductThunk.fulfilled, (state, action) => {
+        state.updating = false;
+
+        const updatedProduct = action.payload.data;
+
+        state.products = state.products.map((product) =>
+          product.id === updatedProduct.id ? updatedProduct : product
+        );
+
+        state.selectedProduct = updatedProduct;
+      })
+      .addCase(updateProductThunk.rejected, (state, action) => {
+        state.updating = false;
+        state.updateError = action.payload || "Failed to update product";
+      })
+
+      // DELETE
+      .addCase(deleteProductThunk.pending, (state) => {
+        state.deleting = true;
+        state.deleteError = null;
+      })
+      .addCase(deleteProductThunk.fulfilled, (state, action) => {
+        state.deleting = false;
+
+        state.products = state.products.filter(
+          (product) => product.id !== action.payload
+        );
+      })
+      .addCase(deleteProductThunk.rejected, (state, action) => {
+        state.deleting = false;
+        state.deleteError = action.payload || "Failed to delete product";
       });
   },
 });
 
-export const { resetCreateProductState } = adminProductSlice.actions;
+export const {
+  resetCreateProductState,
+  clearSelectedProduct,
+} = adminProductSlice.actions;
 
 export default adminProductSlice.reducer;
