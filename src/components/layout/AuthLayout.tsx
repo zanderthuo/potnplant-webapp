@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import logo from "../../assets/logo.jpeg";
+import logo from "../../assets/logo-light.png";
 
 type Props = {
   title: string;
@@ -25,11 +25,11 @@ export function AuthLayout({
           <img
             src={logo}
             alt="PotnPlant"
-            className="mx-auto h-24 w-24 rounded-full border-2 border-white/20 object-cover shadow-2xl"
+            className="mx-auto h-24 w-28 object-cover"
           />
 
           <h1 className="mt-4 font-display text-4xl font-black tracking-[0.15em] text-[#f4b400]">
-            POTnPLANT
+            POTPLANT
           </h1>
 
           <p className="mt-2 text-sm text-white/70">
