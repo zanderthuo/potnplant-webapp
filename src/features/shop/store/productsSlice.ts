@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getProducts } from "../api/productsApi";
+import { getProductById, getProducts } from "../api/productsApi";
 import type { Product } from "../../../lib/products";
 
 type ApiResponse<T> = {
@@ -44,16 +44,7 @@ export const fetchProduct = createAsyncThunk<
   { rejectValue: string }
 >("products/fetchProduct", async (id, { rejectWithValue }) => {
   try {
-    const products: Product[] = await getProducts();
-
-    const product = products.find(
-      (p) => p.id === id
-    );
-
-    if (!product) {
-      return rejectWithValue("Product not found");
-    }
-
+    const product = await getProductById(id);
     return product;
   } catch (error: any) {
     return rejectWithValue(
