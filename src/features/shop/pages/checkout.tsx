@@ -34,22 +34,24 @@ export default function CheckoutPage() {
   }, [dispatch, products.length]);
 
   const detailed = useMemo(() => {
-    return Object.entries(cartItems)
-      .map(([productId, qty]) => {
-        const product = products.find((item) => item.id === productId);
+  return Object.entries(cartItems)
+    .map(([productId, qty]) => {
+      const product = products.find(
+        (item) => String(item.id) === String(productId)
+      );
 
-        if (!product) return null;
+      if (!product) return null;
 
-        return {
-          product,
-          qty,
-        };
-      })
-      .filter(Boolean) as {
-      product: (typeof products)[number];
-      qty: number;
-    }[];
-  }, [cartItems, products]);
+      return {
+        product,
+        qty,
+      };
+    })
+    .filter(Boolean) as {
+    product: (typeof products)[number];
+    qty: number;
+  }[];
+}, [cartItems, products]);
 
   const subtotal = detailed.reduce(
     (total, item) => total + Number(item.product.price) * item.qty,
