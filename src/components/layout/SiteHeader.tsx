@@ -7,11 +7,12 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { logout } from "../../features/auth/store/authSlice";
+import { fetchAdminCategoriesThunk } from "../../features/admin/store/adminCategorySlice";
 import logo from "../../assets/logo.jpeg";
 
 const nav = [
@@ -28,9 +29,22 @@ export function SiteHeader() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [productsOpen, setProductsOpen] = useState(false);
 
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const cartItems = useAppSelector((state) => state.cart.items);
+
+  const { categories: productCategories } = useAppSelector(
+    (state) => state.adminCategories
+  );
+
+  useEffect(() => {
+    dispatch(fetchAdminCategoriesThunk());
+  }, [dispatch]);
+
+  const activeCategories = productCategories.filter(
+    (category) => category.isActive !== false
+  );
 
   const count = Object.values(cartItems).reduce(
     (total, qty) => total + qty,
@@ -58,7 +72,10 @@ export function SiteHeader() {
     return currentUrl === to || currentPath === to;
   };
 
-  const closeMenu = () => setMenuOpen(false);
+  const closeMenu = () => {
+    setMenuOpen(false);
+    setProductsOpen(false);
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -66,6 +83,9 @@ export function SiteHeader() {
     setMenuOpen(false);
     navigate("/login");
   };
+
+  const categoryLink = (name: string) =>
+    `/shop?category=${encodeURIComponent(name)}`;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -83,6 +103,55 @@ export function SiteHeader() {
         <nav className="hidden flex-1 items-center justify-center gap-8 text-sm lg:flex">
           {nav.map((item) => {
             const active = isActive(item.to);
+
+            if (item.label === "Products") {
+              return (
+                <div
+                  key={item.to}
+                  className="relative"
+                  onMouseEnter={() => setProductsOpen(true)}
+                  onMouseLeave={() => setProductsOpen(false)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setProductsOpen((current) => !current)}
+                    className={`relative flex items-center gap-1 pb-1 transition ${
+                      active || currentPath === "/shop"
+                        ? "text-primary"
+                        : "text-foreground/80 hover:text-foreground"
+                    }`}
+                  >
+                    Products
+                    <ChevronDown className="h-4 w-4" />
+
+                    {(active || currentPath === "/shop") && (
+                      <span className="absolute inset-x-0 -bottom-1 mx-auto h-[2px] w-6 bg-primary" />
+                    )}
+                  </button>
+
+                  {productsOpen && (
+                    <div className="absolute left-1/2 top-8 z-50 w-60 -translate-x-1/2 rounded-xl border border-border bg-background p-2 shadow-lg">
+                      <a
+                        href="/shop"
+                        className="block rounded-lg px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-primary"
+                      >
+                        All Products
+                      </a>
+
+                      {activeCategories.map((category) => (
+                        <a
+                          key={category.id}
+                          href={categoryLink(category.name)}
+                          className="block rounded-lg px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-primary"
+                        >
+                          {category.name}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
 
             return (
               <a
@@ -143,6 +212,7 @@ export function SiteHeader() {
                     <p className="truncate text-sm font-semibold text-foreground">
                       {displayName}
                     </p>
+
                     {user?.email && (
                       <p className="truncate text-xs text-muted-foreground">
                         {user.email}
@@ -200,6 +270,45 @@ export function SiteHeader() {
             {nav.map((item) => {
               const active = isActive(item.to);
 
+              if (item.label === "Products") {
+                return (
+                  <div key={item.to}>
+                    <a
+                      href="/shop"
+                      onClick={closeMenu}
+                      className={`block rounded-lg px-4 py-3 text-sm transition ${
+                        currentPath === "/shop"
+                          ? "bg-primary/10 font-semibold text-primary"
+                          : "text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      Products
+                    </a>
+
+                    <div className="ml-4 border-l border-border pl-3">
+                      <a
+                        href="/shop"
+                        onClick={closeMenu}
+                        className="block rounded-lg px-4 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-primary"
+                      >
+                        All Products
+                      </a>
+
+                      {activeCategories.map((category) => (
+                        <a
+                          key={category.id}
+                          href={categoryLink(category.name)}
+                          onClick={closeMenu}
+                          className="block rounded-lg px-4 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-primary"
+                        >
+                          {category.name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
               return (
                 <a
                   key={item.to}
@@ -237,6 +346,7 @@ export function SiteHeader() {
                     <p className="text-sm font-semibold text-foreground">
                       {displayName}
                     </p>
+
                     {user?.email && (
                       <p className="text-xs text-muted-foreground">
                         {user.email}
@@ -270,7 +380,7 @@ export function SiteHeader() {
             <div className="mt-4 border-t border-border pt-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <span>(+254) 788 727 645</span>
+                <span>(+254) 143 513 999</span>
               </div>
             </div>
           </nav>

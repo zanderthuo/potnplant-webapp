@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import { categories } from "../../../lib/products";
 import type { Product } from "../../../lib/products";
 import { ProductCard } from "../../../components/ProductCard";
@@ -8,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { fetchProducts } from "../store/productsSlice";
 
 const PRODUCTS_PER_PAGE = 6;
+
 type SortType = "default" | "price-asc" | "price-desc";
 
 type ApiCategory =
@@ -35,13 +38,23 @@ export default function ShopPage() {
   const dispatch = useAppDispatch();
   const { items, loading, error } = useAppSelector((state) => state.products);
 
-  const [cat, setCat] = useState<string>("All");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [cat, setCat] = useState<string>(
+    searchParams.get("category") || "All"
+  );
   const [sort, setSort] = useState<SortType>("default");
   const [page, setPage] = useState(1);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
+
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get("category") || "All";
+    setCat(categoryFromUrl);
+    setPage(1);
+  }, [searchParams]);
 
   const products = useMemo<Product[]>(() => {
     return (items as ProductWithApiCategory[]).map((product) => ({
@@ -101,6 +114,12 @@ export default function ShopPage() {
   const handleCategoryChange = (category: string) => {
     setCat(category);
     setPage(1);
+
+    if (category === "All") {
+      setSearchParams({});
+    } else {
+      setSearchParams({ category });
+    }
   };
 
   const handleSortChange = (value: SortType) => {
@@ -155,6 +174,12 @@ export default function ShopPage() {
             </a>
             <ChevronRight className="h-3 w-3" />
             <span className="text-[#0f4f2b]">Shop</span>
+            {cat !== "All" && (
+              <>
+                <ChevronRight className="h-3 w-3" />
+                <span className="text-[#0f4f2b]">{cat}</span>
+              </>
+            )}
           </p>
         </div>
       </section>
@@ -204,6 +229,21 @@ export default function ShopPage() {
               </h3>
 
               <ul className="mt-6 space-y-3 text-sm">
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryChange("All")}
+                    className={`flex w-full justify-between border-b border-[#2f7d32]/15 pb-3 text-left transition ${
+                      cat === "All"
+                        ? "font-semibold text-primary"
+                        : "text-muted-foreground hover:text-[#0f4f2b]"
+                    }`}
+                  >
+                    <span>All</span>
+                    <span>({products.length})</span>
+                  </button>
+                </li>
+
                 {categoryCounts.map((category) => (
                   <li key={category.name}>
                     <button
@@ -247,11 +287,17 @@ export default function ShopPage() {
                 </p>
               </div>
 
-              <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-                {paginatedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+              {paginatedProducts.length > 0 ? (
+                <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+                  {paginatedProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-[#2f7d32]/15 bg-white/60 p-8 text-center text-sm text-muted-foreground">
+                  No products found in this category.
+                </div>
+              )}
 
               {totalPages > 1 && (
                 <div className="mt-12 flex flex-wrap items-center justify-center gap-2">
